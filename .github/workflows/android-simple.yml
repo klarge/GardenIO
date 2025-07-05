@@ -1,4 +1,4 @@
-name: Build Android App
+name: Build Android App (Simple)
 
 on:
   push:
@@ -26,9 +26,6 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
 
     - name: Install dependencies
       run: npm ci
@@ -64,6 +61,14 @@ jobs:
 
     - name: Sync Capacitor
       run: cap sync android
+
+    - name: Set Android SDK path
+      run: |
+        echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
     - name: Accept Android licenses
       run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses

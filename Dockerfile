@@ -1,45 +1,27 @@
-# Build stage for the frontend
-FROM node:20-alpine AS frontend-build
+# Build stage
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including dev dependencies for building)
+RUN npm ci
 
-# Copy frontend source
+# Copy source code
 COPY client ./client
+COPY server ./server
 COPY shared ./shared
 COPY vite.config.ts ./
 COPY tailwind.config.ts ./
 COPY postcss.config.js ./
 COPY tsconfig.json ./
 COPY components.json ./
-
-# Build frontend
-RUN npm run build
-
-# Build stage for the backend
-FROM node:20-alpine AS backend-build
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install all dependencies (including dev dependencies for TypeScript compilation)
-RUN npm ci
-
-# Copy backend source
-COPY server ./server
-COPY shared ./shared
 COPY drizzle.config.ts ./
-COPY tsconfig.json ./
 
-# Build backend
-RUN npm run build:server
+# Build both frontend and backend
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine AS production
@@ -50,11 +32,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
-# Copy built backend
-COPY --from=backend-build /app/dist ./dist
-
-# Copy built frontend
-COPY --from=frontend-build /app/dist/public ./dist/public
+# Copy built files
+COPY --from=build /app/dist ./dist
 
 # Copy shared files
 COPY shared ./shared

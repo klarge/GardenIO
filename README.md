@@ -69,8 +69,8 @@ npm run dev
 
 The application includes GitHub Actions for automatic Docker image building:
 
-- **Docker Hub**: Images are automatically built and pushed to GitHub Container Registry
-- **Multi-platform**: Supports both AMD64 and ARM64 architectures
+- **GitHub Container Registry**: Images are automatically built and pushed to GitHub Container Registry
+- **AMD64 Architecture**: Optimized builds for Linux AMD64 systems
 - **Production ready**: Optimized for deployment with health checks
 
 To deploy manually:
@@ -90,8 +90,8 @@ docker run -p 5000:5000 \
 The project includes GitHub Actions for building Android apps using Capacitor:
 
 - **APK Generation**: Debug APKs are built for every push
-- **Release Builds**: AAB bundles are created for tagged releases
-- **Automatic Releases**: GitHub releases are created with downloadable apps
+- **Java 11 Compatibility**: Configured for stable Android builds
+- **Automatic Releases**: GitHub releases are created with downloadable APKs
 
 To build locally:
 ```bash

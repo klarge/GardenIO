@@ -125,10 +125,12 @@ Changelog:
 - July 05, 2025. Deployment infrastructure and packaging:
   * Created comprehensive Docker containerization with multi-stage builds
   * Added GitHub Actions for automated Docker image building and publishing
-  * Implemented Android app packaging using Capacitor with APK/AAB generation
+  * Implemented Android app packaging using Capacitor with APK generation
   * Added Docker Compose for local development with PostgreSQL
   * Created health check endpoints for production monitoring
   * Added comprehensive README with deployment instructions
+  * Fixed GitHub Actions workflows for reliable Docker and Android builds
+  * Configured Java 11 compatibility for stable Android compilation
 ```
 
 ## User Preferences
