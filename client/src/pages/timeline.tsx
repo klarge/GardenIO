@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Sprout, Apple, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, isToday, addMonths, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, isToday, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from "date-fns";
 import { calculateSproutDate, calculateHarvestDate, getPlantingStatus, getRelativeTime } from "@/lib/date-utils";
 import type { PlantingWithPlant } from "@shared/schema";
 
@@ -17,7 +17,9 @@ export default function Timeline() {
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const calendarStart = startOfWeek(monthStart);
+  const calendarEnd = endOfWeek(monthEnd);
+  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   // Get events for the current month
   const monthEvents = plantings.flatMap(planting => {
@@ -188,14 +190,21 @@ export default function Timeline() {
               ))}
               
               {/* Calendar Days */}
-              {monthDays.map((date) => {
+              {calendarDays.map((date) => {
                 const dayEvents = getEventsForDay(date);
                 const dayNumber = getDate(date);
+                const isCurrentMonth = isSameMonth(date, currentMonth);
                 
                 return (
-                  <div key={date.toISOString()} className="bg-card p-3 min-h-[120px]">
+                  <div key={date.toISOString()} className={`bg-card p-3 min-h-[120px] ${
+                    !isCurrentMonth ? "opacity-40" : ""
+                  }`}>
                     <div className={`text-sm font-medium mb-2 ${
-                      isToday(date) ? "text-green-600 dark:text-green-400 font-bold" : "text-foreground"
+                      isToday(date) 
+                        ? "text-green-600 dark:text-green-400 font-bold" 
+                        : isCurrentMonth 
+                          ? "text-foreground" 
+                          : "text-muted-foreground"
                     }`}>
                       {dayNumber}
                     </div>
