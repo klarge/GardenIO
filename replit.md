@@ -99,6 +99,13 @@ Changelog:
   * All planting information, edit/delete buttons now on cards directly (no popups)
   * Added persistent data storage with automatic sample data seeding
   * Protected all routes with authentication requirements
+- July 05, 2025. GardenIO rebranding and enhanced UX:
+  * Renamed app from GardenTracker to GardenIO
+  * Added user menu with dark/light mode toggle and password change functionality
+  * Made planting cards compact (4 per row) with detailed popup views
+  * Added plant images in popup details from library
+  * Fixed dark mode support across all pages including Calendar/Timeline
+  * Enhanced theme system with proper contrast and readability
 ```
 
 ## User Preferences

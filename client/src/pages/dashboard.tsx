@@ -166,7 +166,7 @@ export default function Dashboard() {
       {/* Filter Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card 
-          className={`cursor-pointer transition-all ${activeFilter === "all" ? "ring-2 ring-green-500 bg-green-50" : "hover:shadow-md"}`}
+          className={`cursor-pointer transition-all ${activeFilter === "all" ? "ring-2 ring-green-500 bg-green-50 dark:bg-green-950" : "hover:shadow-md"}`}
           onClick={() => setActiveFilter("all")}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -180,7 +180,7 @@ export default function Dashboard() {
         </Card>
 
         <Card 
-          className={`cursor-pointer transition-all ${activeFilter === "active" ? "ring-2 ring-green-500 bg-green-50" : "hover:shadow-md"}`}
+          className={`cursor-pointer transition-all ${activeFilter === "active" ? "ring-2 ring-green-500 bg-green-50 dark:bg-green-950" : "hover:shadow-md"}`}
           onClick={() => setActiveFilter("active")}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -194,7 +194,7 @@ export default function Dashboard() {
         </Card>
 
         <Card 
-          className={`cursor-pointer transition-all ${activeFilter === "ready" ? "ring-2 ring-green-500 bg-green-50" : "hover:shadow-md"}`}
+          className={`cursor-pointer transition-all ${activeFilter === "ready" ? "ring-2 ring-green-500 bg-green-50 dark:bg-green-950" : "hover:shadow-md"}`}
           onClick={() => setActiveFilter("ready")}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -208,7 +208,7 @@ export default function Dashboard() {
         </Card>
 
         <Card 
-          className={`cursor-pointer transition-all ${activeFilter === "sprouting" ? "ring-2 ring-green-500 bg-green-50" : "hover:shadow-md"}`}
+          className={`cursor-pointer transition-all ${activeFilter === "sprouting" ? "ring-2 ring-green-500 bg-green-50 dark:bg-green-950" : "hover:shadow-md"}`}
           onClick={() => setActiveFilter("sprouting")}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

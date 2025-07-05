@@ -98,13 +98,13 @@ export default function Timeline() {
   const getEventColor = (type: string) => {
     switch (type) {
       case "planted":
-        return "bg-garden-green text-white";
+        return "bg-green-600 dark:bg-green-500 text-white";
       case "sprouting":
-        return "bg-yellow-500 text-white";
+        return "bg-yellow-500 dark:bg-yellow-400 text-white dark:text-black";
       case "harvest":
-        return "bg-harvest-orange text-white";
+        return "bg-orange-500 dark:bg-orange-400 text-white dark:text-black";
       default:
-        return "bg-gray-500 text-white";
+        return "bg-gray-500 dark:bg-gray-400 text-white dark:text-black";
     }
   };
 
@@ -131,8 +131,8 @@ export default function Timeline() {
     <div className="space-y-8">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-seed-dark mb-2">Garden Timeline</h2>
-        <p className="text-soil-gray">Track your garden's progress and upcoming activities</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Garden Timeline</h2>
+        <p className="text-muted-foreground">Track your garden's progress and upcoming activities</p>
       </div>
 
       {/* Timeline Controls */}
@@ -148,7 +148,7 @@ export default function Timeline() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <h3 className="text-lg font-semibold text-seed-dark">
+                <h3 className="text-lg font-semibold text-foreground">
                   {format(currentMonth, "MMMM yyyy")}
                 </h3>
                 <Button
@@ -161,7 +161,7 @@ export default function Timeline() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="default" className="bg-garden-green hover:bg-green-600">
+              <Button variant="default" className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600">
                 Month
               </Button>
               <Button variant="outline">Week</Button>
@@ -176,13 +176,13 @@ export default function Timeline() {
         <CardContent className="p-6">
           {isLoading ? (
             <div className="animate-pulse">
-              <div className="h-96 bg-gray-200 rounded"></div>
+              <div className="h-96 bg-muted rounded"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-7 gap-px bg-slate-200 rounded-lg overflow-hidden">
+            <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
               {/* Calendar Header */}
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                <div key={day} className="bg-slate-50 p-4 text-center text-sm font-medium text-soil-gray">
+                <div key={day} className="bg-muted p-4 text-center text-sm font-medium text-muted-foreground">
                   {day}
                 </div>
               ))}
@@ -193,9 +193,9 @@ export default function Timeline() {
                 const dayNumber = getDate(date);
                 
                 return (
-                  <div key={date.toISOString()} className="bg-white p-3 min-h-[120px]">
+                  <div key={date.toISOString()} className="bg-card p-3 min-h-[120px]">
                     <div className={`text-sm font-medium mb-2 ${
-                      isToday(date) ? "text-garden-green font-bold" : "text-seed-dark"
+                      isToday(date) ? "text-green-600 dark:text-green-400 font-bold" : "text-foreground"
                     }`}>
                       {dayNumber}
                     </div>
@@ -223,24 +223,26 @@ export default function Timeline() {
       {/* Upcoming Events */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-seed-dark">Upcoming Events</CardTitle>
+          <CardTitle className="text-lg font-semibold text-foreground">Upcoming Events</CardTitle>
         </CardHeader>
         <CardContent>
           {upcoming.length === 0 ? (
-            <p className="text-soil-gray text-center py-8">No upcoming events in the next 30 days</p>
+            <p className="text-muted-foreground text-center py-8">No upcoming events in the next 30 days</p>
           ) : (
             <div className="space-y-4">
               {upcoming.map((event, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-lg">
                   <div className="flex items-center space-x-4">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      event.type === "harvest" ? "bg-orange-100" : "bg-yellow-100"
+                      event.type === "harvest" 
+                        ? "bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300" 
+                        : "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300"
                     }`}>
                       {getEventIcon(event.type)}
                     </div>
                     <div>
-                      <h4 className="font-medium text-seed-dark">{event.title}</h4>
-                      <p className="text-sm text-soil-gray">{event.description}</p>
+                      <h4 className="font-medium text-foreground">{event.title}</h4>
+                      <p className="text-sm text-muted-foreground">{event.description}</p>
                     </div>
                   </div>
                   <Badge className={getEventColor(event.type)}>
