@@ -42,6 +42,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded images
   app.use('/uploads', express.static(uploadsDir));
 
+  // Health check endpoint
+  app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
   // Image upload endpoint
   app.post('/api/upload-image', upload.single('image'), (req, res) => {
     if (!req.isAuthenticated()) {

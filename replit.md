@@ -69,14 +69,30 @@ The application uses two main database tables:
 
 ## Deployment Strategy
 
-The application is configured for deployment with:
+The application is configured for deployment with multiple options:
+
+### Traditional Deployment
 - **Build Process**: Vite builds the frontend to `dist/public`
 - **Server Bundle**: esbuild bundles the Express server for production
 - **Environment Variables**: Database connection via `DATABASE_URL`
 - **Static Assets**: Frontend assets served by Express in production
 - **Database**: Uses Neon Database for serverless PostgreSQL hosting
 
-The build process creates a single deployable package with the bundled server serving both API endpoints and static frontend assets.
+### Docker Containerization
+- **Multi-stage Build**: Optimized Docker builds with separate frontend and backend stages
+- **Health Checks**: Built-in health monitoring for production deployments
+- **Docker Compose**: Complete stack with PostgreSQL for local development
+- **GitHub Actions**: Automated Docker image building and publishing to GitHub Container Registry
+- **Multi-platform**: Supports both AMD64 and ARM64 architectures
+
+### Android App Packaging
+- **Capacitor Integration**: Uses Capacitor to wrap the web app as a native Android app
+- **APK Generation**: Automatic debug APK builds for development
+- **Release Builds**: AAB bundles for Google Play Store deployment
+- **GitHub Actions**: Automated Android app building with artifact uploads
+- **GitHub Releases**: Automatic release creation with downloadable APKs
+
+The build process creates multiple deployment artifacts: bundled web server, Docker images, and Android APKs.
 
 ## Changelog
 
@@ -106,6 +122,13 @@ Changelog:
   * Added plant images in popup details from library
   * Fixed dark mode support across all pages including Calendar/Timeline
   * Enhanced theme system with proper contrast and readability
+- July 05, 2025. Deployment infrastructure and packaging:
+  * Created comprehensive Docker containerization with multi-stage builds
+  * Added GitHub Actions for automated Docker image building and publishing
+  * Implemented Android app packaging using Capacitor with APK/AAB generation
+  * Added Docker Compose for local development with PostgreSQL
+  * Created health check endpoints for production monitoring
+  * Added comprehensive README with deployment instructions
 ```
 
 ## User Preferences
