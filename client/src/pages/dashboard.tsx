@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Sprout, Apple, Clock, Leaf, Edit, Trash2, MapPin, Calendar } from "lucide-react";
+import { Sprout, Apple, Clock, Edit, Trash2, MapPin, Calendar, Plus } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { getPlantingStatus, getStatusColor, formatDate, calculateSproutDate, calculateHarvestDate } from "@/lib/date-utils";
 import { PlantingForm } from "@/components/planting-form";
@@ -21,8 +21,10 @@ interface DashboardStats {
   plantVarieties: number;
 }
 
+type FilterType = "all" | "active" | "ready" | "sprouting";
+
 export default function Dashboard() {
-  const [showActivePlantings, setShowActivePlantings] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [showAddPlanting, setShowAddPlanting] = useState(false);
   const [editingPlanting, setEditingPlanting] = useState<PlantingWithPlant | null>(null);
   const { toast } = useToast();
@@ -31,7 +33,7 @@ export default function Dashboard() {
     queryKey: ["/api/stats"],
   });
 
-  const { data: plantings, isLoading: plantingsLoading } = useQuery<PlantingWithPlant[]>({
+  const { data: plantings = [], isLoading: plantingsLoading } = useQuery<PlantingWithPlant[]>({
     queryKey: ["/api/plantings"],
   });
 
@@ -50,13 +52,13 @@ export default function Dashboard() {
       setShowAddPlanting(false);
       toast({
         title: "Success",
-        description: "Planting recorded successfully",
+        description: "Planting added successfully!",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to record planting",
+        description: "Failed to add planting. Please try again.",
         variant: "destructive",
       });
     },
@@ -64,7 +66,7 @@ export default function Dashboard() {
 
   const updatePlantingMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<InsertPlanting> }) => {
-      const response = await apiRequest("PUT", `/api/plantings/${id}`, data);
+      const response = await apiRequest("PATCH", `/api/plantings/${id}`, data);
       return response.json();
     },
     onSuccess: () => {
@@ -73,13 +75,13 @@ export default function Dashboard() {
       setEditingPlanting(null);
       toast({
         title: "Success",
-        description: "Planting updated successfully",
+        description: "Planting updated successfully!",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to update planting",
+        description: "Failed to update planting. Please try again.",
         variant: "destructive",
       });
     },
@@ -94,313 +96,258 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       toast({
         title: "Success",
-        description: "Planting deleted successfully",
+        description: "Planting deleted successfully!",
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to delete planting",
+        description: "Failed to delete planting. Please try again.",
         variant: "destructive",
       });
     },
   });
 
-  const recentPlantings = plantings?.slice(-5) || [];
-  const upcomingHarvest = plantings?.filter(p => {
-    const status = getPlantingStatus(new Date(p.plantedDate), p.plant.daysToSprout, p.plant.daysToHarvest);
-    return status === "ready" || status === "growing";
-  }).slice(0, 5) || [];
+  const getFilteredPlantings = () => {
+    const now = new Date();
+    
+    switch (activeFilter) {
+      case "active":
+        return plantings.filter(p => p.status !== "harvested");
+      case "ready":
+        return plantings.filter(p => {
+          const plantedDate = new Date(p.plantedDate);
+          const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
+          return daysSincePlanted >= p.plant.daysToHarvest && p.status !== "harvested";
+        });
+      case "sprouting":
+        return plantings.filter(p => {
+          const plantedDate = new Date(p.plantedDate);
+          const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
+          return daysSincePlanted >= p.plant.daysToSprout && daysSincePlanted < p.plant.daysToHarvest && p.status !== "harvested";
+        });
+      default:
+        return plantings;
+    }
+  };
+
+  const filteredPlantings = getFilteredPlantings();
+
+  const handleEditPlanting = (planting: PlantingWithPlant) => {
+    setEditingPlanting(planting);
+  };
+
+  const handleDeletePlanting = (id: number) => {
+    deletePlantingMutation.mutate(id);
+  };
 
   if (statsLoading || plantingsLoading) {
     return (
-      <div className="space-y-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-seed-dark mb-2">Garden Dashboard</h2>
-          <p className="text-soil-gray">Overview of your current plantings and upcoming harvest dates</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="h-16 bg-gray-200 rounded"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-8">
-      {/* Dashboard Header */}
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-seed-dark mb-2">Garden Dashboard</h2>
-          <p className="text-soil-gray">Overview of your current plantings and upcoming harvest dates</p>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">Track your garden's progress</p>
         </div>
-        <Button 
-          onClick={() => setShowAddPlanting(true)}
-          className="mt-4 sm:mt-0 bg-garden-green hover:bg-green-600"
-        >
-          <span className="mr-2">+</span>Add Planting
+        <Button onClick={() => setShowAddPlanting(true)} className="bg-green-600 hover:bg-green-700">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Planting
         </Button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Filter Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowActivePlantings(true)}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-soil-gray">Active Plantings</p>
-                <p className="text-2xl font-bold text-seed-dark">{stats?.activePlantings || 0}</p>
-              </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <Sprout className="text-garden-green text-lg" />
-              </div>
-            </div>
+        <Card 
+          className={`cursor-pointer transition-all ${activeFilter === "all" ? "ring-2 ring-green-500 bg-green-50" : "hover:shadow-md"}`}
+          onClick={() => setActiveFilter("all")}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">All Plantings</CardTitle>
+            <Sprout className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{plantings.length}</div>
+            <p className="text-xs text-muted-foreground">Total plantings</p>
           </CardContent>
         </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-soil-gray">Ready to Harvest</p>
-                <p className="text-2xl font-bold text-harvest-orange">{stats?.readyHarvest || 0}</p>
-              </div>
-              <div className="bg-orange-100 p-3 rounded-full">
-                <Apple className="text-harvest-orange text-lg" />
-              </div>
-            </div>
+
+        <Card 
+          className={`cursor-pointer transition-all ${activeFilter === "active" ? "ring-2 ring-green-500 bg-green-50" : "hover:shadow-md"}`}
+          onClick={() => setActiveFilter("active")}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Plantings</CardTitle>
+            <Sprout className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.activePlantings || 0}</div>
+            <p className="text-xs text-muted-foreground">Currently growing</p>
           </CardContent>
         </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-soil-gray">Sprouting Soon</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats?.sproutingSoon || 0}</p>
-              </div>
-              <div className="bg-yellow-100 p-3 rounded-full">
-                <Clock className="text-yellow-600 text-lg" />
-              </div>
-            </div>
+
+        <Card 
+          className={`cursor-pointer transition-all ${activeFilter === "ready" ? "ring-2 ring-green-500 bg-green-50" : "hover:shadow-md"}`}
+          onClick={() => setActiveFilter("ready")}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Ready to Harvest</CardTitle>
+            <Apple className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.readyHarvest || 0}</div>
+            <p className="text-xs text-muted-foreground">Ready now</p>
           </CardContent>
         </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-soil-gray">Plant Varieties</p>
-                <p className="text-2xl font-bold text-seed-dark">{stats?.plantVarieties || 0}</p>
-              </div>
-              <div className="bg-slate-100 p-3 rounded-full">
-                <Leaf className="text-soil-gray text-lg" />
-              </div>
-            </div>
+
+        <Card 
+          className={`cursor-pointer transition-all ${activeFilter === "sprouting" ? "ring-2 ring-green-500 bg-green-50" : "hover:shadow-md"}`}
+          onClick={() => setActiveFilter("sprouting")}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Sprouting Soon</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.sproutingSoon || 0}</div>
+            <p className="text-xs text-muted-foreground">Almost ready</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Activity & Upcoming Events */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Plantings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-seed-dark">Recent Plantings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentPlantings.length === 0 ? (
-              <p className="text-soil-gray text-center py-8">No recent plantings found</p>
-            ) : (
-              <div className="space-y-4">
-                {recentPlantings.map((planting) => {
-                  const status = getPlantingStatus(new Date(planting.plantedDate), planting.plant.daysToSprout, planting.plant.daysToHarvest);
-                  return (
-                    <div key={planting.id} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                          <Sprout className="text-garden-green text-sm" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-seed-dark">{planting.plant.name}</p>
-                          <p className="text-sm text-soil-gray">
-                            {planting.location} • {formatDistanceToNow(new Date(planting.plantedDate), { addSuffix: true })}
-                          </p>
+      {/* Plantings Grid */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">
+            {activeFilter === "all" && "All Plantings"}
+            {activeFilter === "active" && "Active Plantings"}
+            {activeFilter === "ready" && "Ready to Harvest"}
+            {activeFilter === "sprouting" && "Sprouting Soon"}
+            {filteredPlantings.length > 0 && ` (${filteredPlantings.length})`}
+          </h2>
+        </div>
+
+        {filteredPlantings.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Sprout className="h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No plantings found</h3>
+              <p className="text-gray-600 text-center max-w-md">
+                {activeFilter === "all" 
+                  ? "Get started by adding your first planting!"
+                  : `No plantings match the ${activeFilter} filter.`
+                }
+              </p>
+              {activeFilter === "all" && (
+                <Button onClick={() => setShowAddPlanting(true)} className="mt-4">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Planting
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPlantings.map((planting) => {
+              const status = getPlantingStatus(
+                new Date(planting.plantedDate),
+                planting.plant.daysToSprout,
+                planting.plant.daysToHarvest
+              );
+              const statusColor = getStatusColor(status);
+              const sproutDate = calculateSproutDate(new Date(planting.plantedDate), planting.plant.daysToSprout);
+              const harvestDate = calculateHarvestDate(new Date(planting.plantedDate), planting.plant.daysToHarvest);
+
+              return (
+                <Card key={planting.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{planting.plant.name}</CardTitle>
+                        <div className="flex items-center text-sm text-gray-600 mt-1">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          {planting.location}
                         </div>
                       </div>
-                      <Badge className={getStatusColor(status)}>
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                      </Badge>
+                      <Badge variant={statusColor as any}>{status}</Badge>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Upcoming Harvest */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-seed-dark">Upcoming Harvest</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {upcomingHarvest.length === 0 ? (
-              <p className="text-soil-gray text-center py-8">No upcoming harvests</p>
-            ) : (
-              <div className="space-y-4">
-                {upcomingHarvest.map((planting) => {
-                  const status = getPlantingStatus(new Date(planting.plantedDate), planting.plant.daysToSprout, planting.plant.daysToHarvest);
-                  return (
-                    <div key={planting.id} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                          <Apple className="text-harvest-orange text-sm" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-seed-dark">{planting.plant.name}</p>
-                          <p className="text-sm text-soil-gray">
-                            {planting.location} • {formatDistanceToNow(new Date(planting.plantedDate), { addSuffix: true })}
-                          </p>
-                        </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <div className="text-gray-600">Planted</div>
+                        <div className="font-medium">{formatDate(new Date(planting.plantedDate))}</div>
                       </div>
-                      <Badge className={getStatusColor(status)}>
-                        {status === "ready" ? "Ready Soon" : "Growing"}
-                      </Badge>
+                      <div>
+                        <div className="text-gray-600">Quantity</div>
+                        <div className="font-medium">{planting.quantity}</div>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Active Plantings Dialog */}
-      <Dialog open={showActivePlantings} onOpenChange={setShowActivePlantings}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Active Plantings</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {plantings?.length === 0 ? (
-              <p className="text-soil-gray text-center py-8">No active plantings found</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {plantings?.map((planting) => {
-                  const plantedDate = new Date(planting.plantedDate);
-                  const sproutDate = calculateSproutDate(plantedDate, planting.plant.daysToSprout);
-                  const harvestDate = calculateHarvestDate(plantedDate, planting.plant.daysToHarvest);
-                  const status = getPlantingStatus(plantedDate, planting.plant.daysToSprout, planting.plant.daysToHarvest);
-                  
-                  return (
-                    <Card key={planting.id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{planting.plant.name}</CardTitle>
-                          <Badge className={getStatusColor(status)}>
-                            {status.charAt(0).toUpperCase() + status.slice(1)}
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-sm text-soil-gray">
-                            <MapPin className="h-4 w-4" />
-                            <span>{planting.location}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-soil-gray">
-                            <Calendar className="h-4 w-4" />
-                            <span>Planted: {formatDate(plantedDate)}</span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                              <span className="text-soil-gray">Expected Sprout:</span>
-                              <p className="font-medium">{formatDate(sproutDate)}</p>
-                            </div>
-                            <div>
-                              <span className="text-soil-gray">Expected Harvest:</span>
-                              <p className="font-medium">{formatDate(harvestDate)}</p>
-                            </div>
-                          </div>
-                          <div className="text-sm">
-                            <span className="text-soil-gray">Quantity: </span>
-                            <span className="font-medium">{planting.quantity}</span>
-                          </div>
-                          {planting.notes && (
-                            <div className="text-sm">
-                              <span className="text-soil-gray">Notes: </span>
-                              <p className="text-seed-dark">{planting.notes}</p>
-                            </div>
-                          )}
-                          <div className="flex gap-2 pt-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingPlanting(planting)}
-                              className="flex-1"
-                            >
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Planting</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete this planting record? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => deletePlantingMutation.mutate(planting.id)}
-                                    className="bg-red-600 hover:bg-red-700"
-                                  >
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Expected Sprout</span>
+                        <span className="font-medium">{formatDate(sproutDate)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Expected Harvest</span>
+                        <span className="font-medium">{formatDate(harvestDate)}</span>
+                      </div>
+                    </div>
+
+                    {planting.notes && (
+                      <div className="text-sm">
+                        <div className="text-gray-600 mb-1">Notes</div>
+                        <div className="text-gray-800 italic">{planting.notes}</div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditPlanting(planting)}
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Planting</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this {planting.plant.name} planting? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeletePlanting(planting.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Planting Dialog */}
-      <Dialog open={!!editingPlanting} onOpenChange={() => setEditingPlanting(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Edit Planting</DialogTitle>
-          </DialogHeader>
-          {editingPlanting && (
-            <PlantingForm
-              plants={plants}
-              initialData={editingPlanting}
-              onSubmit={(data) => updatePlantingMutation.mutate({ id: editingPlanting.id, data })}
-              isLoading={updatePlantingMutation.isPending}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        )}
+      </div>
 
       {/* Add Planting Dialog */}
       <Dialog open={showAddPlanting} onOpenChange={setShowAddPlanting}>
@@ -413,6 +360,29 @@ export default function Dashboard() {
             onSubmit={(data) => createPlantingMutation.mutate(data)}
             isLoading={createPlantingMutation.isPending}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Planting Dialog */}
+      <Dialog open={!!editingPlanting} onOpenChange={() => setEditingPlanting(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Planting</DialogTitle>
+          </DialogHeader>
+          {editingPlanting && (
+            <PlantingForm
+              plants={plants}
+              initialData={{
+                plantId: editingPlanting.plantId,
+                location: editingPlanting.location,
+                plantedDate: editingPlanting.plantedDate,
+                quantity: editingPlanting.quantity,
+                notes: editingPlanting.notes || "",
+              }}
+              onSubmit={(data) => updatePlantingMutation.mutate({ id: editingPlanting.id, data })}
+              isLoading={updatePlantingMutation.isPending}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

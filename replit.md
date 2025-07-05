@@ -91,6 +91,14 @@ Changelog:
   * Renamed Timeline to Calendar and moved to end of navigation menu
   * Removed "Add Planting" button from top navigation bar
   * Fixed location dropdown in planting forms to use real API data
+- July 05, 2025. Complete authentication and database implementation:
+  * Added PostgreSQL database with full user authentication system
+  * Implemented user registration and login functionality (no SSO)
+  * Redesigned dashboard with filter cards: Active Plantings, Ready to Harvest, Sprouting Soon
+  * Removed "Plant Varieties" section from dashboard
+  * All planting information, edit/delete buttons now on cards directly (no popups)
+  * Added persistent data storage with automatic sample data seeding
+  * Protected all routes with authentication requirements
 ```
 
 ## User Preferences

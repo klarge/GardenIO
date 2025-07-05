@@ -1,6 +1,18 @@
-import { plants, plantings, locations, type Plant, type InsertPlant, type Planting, type InsertPlanting, type PlantingWithPlant, type Location, type InsertLocation } from "@shared/schema";
+import { plants, plantings, locations, users, type Plant, type InsertPlant, type Planting, type InsertPlanting, type PlantingWithPlant, type Location, type InsertLocation, type User, type InsertUser } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
+
+const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
+  // User operations
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  
   // Plant operations
   getPlants(): Promise<Plant[]>;
   getPlant(id: number): Promise<Plant | undefined>;
@@ -16,286 +28,291 @@ export interface IStorage {
   deleteLocation(id: number): Promise<boolean>;
   
   // Planting operations
-  getPlantings(): Promise<PlantingWithPlant[]>;
+  getPlantings(userId: number): Promise<PlantingWithPlant[]>;
   getPlanting(id: number): Promise<PlantingWithPlant | undefined>;
-  createPlanting(planting: InsertPlanting): Promise<PlantingWithPlant>;
+  createPlanting(planting: InsertPlanting, userId: number): Promise<PlantingWithPlant>;
   updatePlanting(id: number, planting: Partial<InsertPlanting>): Promise<PlantingWithPlant | undefined>;
   deletePlanting(id: number): Promise<boolean>;
   
   // Dashboard stats
-  getStats(): Promise<{
+  getStats(userId: number): Promise<{
     activePlantings: number;
     readyHarvest: number;
     sproutingSoon: number;
     plantVarieties: number;
   }>;
+  
+  // Session store
+  sessionStore: any;
 }
 
-export class MemStorage implements IStorage {
-  private plants: Map<number, Plant>;
-  private plantings: Map<number, Planting>;
-  private locations: Map<number, Location>;
-  private currentPlantId: number;
-  private currentPlantingId: number;
-  private currentLocationId: number;
+export class DatabaseStorage implements IStorage {
+  public sessionStore: any;
 
   constructor() {
-    this.plants = new Map();
-    this.plantings = new Map();
-    this.locations = new Map();
-    this.currentPlantId = 1;
-    this.currentPlantingId = 1;
-    this.currentLocationId = 1;
-    
-    // Initialize with some sample plants and locations
-    this.initializeSamplePlants();
-    this.initializeSampleLocations();
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
+    });
+    this.initializeSampleData();
   }
 
-  private initializeSamplePlants() {
-    const samplePlants: InsertPlant[] = [
-      {
-        name: "Tomato - Cherry",
-        description: "Small, sweet cherry tomatoes perfect for salads and snacking. Easy to grow and very productive.",
-        category: "vegetable",
-        daysToSprout: 10,
-        daysToHarvest: 75,
-        season: "Spring/Summer",
-        imageUrl: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop"
-      },
-      {
-        name: "Lettuce - Romaine",
-        description: "Crisp, tall heads of romaine lettuce with excellent flavor. Great for salads and wraps.",
-        category: "vegetable",
-        daysToSprout: 8,
-        daysToHarvest: 60,
-        season: "Spring/Fall",
-        imageUrl: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=300&fit=crop"
-      },
-      {
-        name: "Basil - Sweet",
-        description: "Classic Italian basil with intense flavor and aroma. Perfect for cooking and making pesto.",
-        category: "herb",
-        daysToSprout: 7,
-        daysToHarvest: 75,
-        season: "Summer",
-        imageUrl: "https://images.unsplash.com/photo-1607532941433-304659e8198a?w=400&h=300&fit=crop"
-      },
-      {
-        name: "Radish - Cherry Belle",
-        description: "Quick-growing, mild-flavored radishes perfect for beginners. Ready to harvest in just 30 days.",
-        category: "vegetable",
-        daysToSprout: 5,
-        daysToHarvest: 30,
-        season: "Spring/Fall",
-        imageUrl: "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?w=400&h=300&fit=crop"
-      },
-      {
-        name: "Spinach - Baby",
-        description: "Tender baby spinach leaves perfect for salads and cooking. Cold-hardy and fast-growing.",
-        category: "vegetable",
-        daysToSprout: 6,
-        daysToHarvest: 45,
-        season: "Spring/Fall",
-        imageUrl: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=300&fit=crop"
-      },
-      {
-        name: "Carrot - Nantes",
-        description: "Sweet, crisp carrots with excellent flavor. Great for fresh eating and storage.",
-        category: "vegetable",
-        daysToSprout: 12,
-        daysToHarvest: 70,
-        season: "Spring/Fall",
-        imageUrl: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=300&fit=crop"
+  private async initializeSampleData() {
+    try {
+      // Check if we already have plants
+      const existingPlants = await this.getPlants();
+      if (existingPlants.length > 0) return;
+
+      // Add sample plants
+      const samplePlants = [
+        {
+          name: "Tomato - Cherry",
+          description: "Small, sweet cherry tomatoes perfect for salads and snacking. Easy to grow and very productive.",
+          category: "vegetable",
+          daysToSprout: 10,
+          daysToHarvest: 75,
+          season: "Spring/Summer",
+          imageUrl: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop"
+        },
+        {
+          name: "Lettuce - Romaine",
+          description: "Crisp, tall heads of romaine lettuce with excellent flavor. Great for salads and wraps.",
+          category: "vegetable",
+          daysToSprout: 8,
+          daysToHarvest: 60,
+          season: "Spring/Fall",
+          imageUrl: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=300&fit=crop"
+        },
+        {
+          name: "Basil - Sweet",
+          description: "Classic Italian basil with intense flavor and aroma. Perfect for cooking and making pesto.",
+          category: "herb",
+          daysToSprout: 7,
+          daysToHarvest: 75,
+          season: "Summer",
+          imageUrl: "https://images.unsplash.com/photo-1607532941433-304659e8198a?w=400&h=300&fit=crop"
+        },
+        {
+          name: "Radish - Cherry Belle",
+          description: "Quick-growing, mild-flavored radishes perfect for beginners. Ready to harvest in just 30 days.",
+          category: "vegetable",
+          daysToSprout: 5,
+          daysToHarvest: 30,
+          season: "Spring/Fall",
+          imageUrl: "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?w=400&h=300&fit=crop"
+        },
+        {
+          name: "Spinach - Baby",
+          description: "Tender baby spinach leaves perfect for salads and cooking. Cold-hardy and fast-growing.",
+          category: "vegetable",
+          daysToSprout: 6,
+          daysToHarvest: 45,
+          season: "Spring/Fall",
+          imageUrl: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=300&fit=crop"
+        },
+        {
+          name: "Carrot - Nantes",
+          description: "Sweet, crisp carrots with excellent flavor. Great for fresh eating and storage.",
+          category: "vegetable",
+          daysToSprout: 12,
+          daysToHarvest: 70,
+          season: "Spring/Fall",
+          imageUrl: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=300&fit=crop"
+        }
+      ];
+
+      for (const plant of samplePlants) {
+        await this.createPlant(plant);
       }
-    ];
 
-    samplePlants.forEach(plant => {
-      this.createPlant(plant);
-    });
+      // Add sample locations
+      const sampleLocations = [
+        {
+          name: "Front Garden",
+          description: "Sunny spot near the front entrance, good for herbs and flowers",
+        },
+        {
+          name: "Back Yard",
+          description: "Large area with full sun, perfect for vegetables",
+        },
+        {
+          name: "Greenhouse",
+          description: "Temperature controlled environment for year-round growing",
+        },
+        {
+          name: "Kitchen Window",
+          description: "Indoor herb garden on the windowsill",
+        },
+      ];
+
+      for (const location of sampleLocations) {
+        await this.createLocation(location);
+      }
+    } catch (error) {
+      console.log("Sample data initialization skipped:", error);
+    }
   }
 
-  private initializeSampleLocations() {
-    const sampleLocations: InsertLocation[] = [
-      {
-        name: "Front Garden",
-        description: "Sunny spot near the front entrance, good for herbs and flowers",
-      },
-      {
-        name: "Back Yard",
-        description: "Large area with full sun, perfect for vegetables",
-      },
-      {
-        name: "Greenhouse",
-        description: "Temperature controlled environment for year-round growing",
-      },
-      {
-        name: "Kitchen Window",
-        description: "Indoor herb garden on the windowsill",
-      },
-    ];
-
-    sampleLocations.forEach(location => {
-      const id = this.currentLocationId++;
-      this.locations.set(id, { 
-        ...location, 
-        id, 
-        description: location.description || null 
-      });
-    });
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  // Plant operations
   async getPlants(): Promise<Plant[]> {
-    return Array.from(this.plants.values());
+    return await db.select().from(plants);
   }
 
   async getPlant(id: number): Promise<Plant | undefined> {
-    return this.plants.get(id);
+    const [plant] = await db.select().from(plants).where(eq(plants.id, id));
+    return plant || undefined;
   }
 
   async createPlant(insertPlant: InsertPlant): Promise<Plant> {
-    const id = this.currentPlantId++;
-    const plant: Plant = { 
-      ...insertPlant, 
-      id,
-      imageUrl: insertPlant.imageUrl || null
-    };
-    this.plants.set(id, plant);
+    const [plant] = await db.insert(plants).values(insertPlant).returning();
     return plant;
   }
 
   async updatePlant(id: number, updatePlant: Partial<InsertPlant>): Promise<Plant | undefined> {
-    const plant = this.plants.get(id);
-    if (!plant) return undefined;
-    
-    const updatedPlant = { ...plant, ...updatePlant };
-    this.plants.set(id, updatedPlant);
-    return updatedPlant;
+    const [plant] = await db.update(plants).set(updatePlant).where(eq(plants.id, id)).returning();
+    return plant || undefined;
   }
 
   async deletePlant(id: number): Promise<boolean> {
-    return this.plants.delete(id);
+    const result = await db.delete(plants).where(eq(plants.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   // Location operations
   async getLocations(): Promise<Location[]> {
-    return Array.from(this.locations.values());
+    return await db.select().from(locations);
   }
 
   async getLocation(id: number): Promise<Location | undefined> {
-    return this.locations.get(id);
+    const [location] = await db.select().from(locations).where(eq(locations.id, id));
+    return location || undefined;
   }
 
   async createLocation(insertLocation: InsertLocation): Promise<Location> {
-    const id = this.currentLocationId++;
-    const location: Location = { 
-      ...insertLocation, 
-      id,
-      description: insertLocation.description || null
-    };
-    this.locations.set(id, location);
+    const [location] = await db.insert(locations).values(insertLocation).returning();
     return location;
   }
 
   async updateLocation(id: number, updateLocation: Partial<InsertLocation>): Promise<Location | undefined> {
-    const location = this.locations.get(id);
-    if (!location) return undefined;
-    
-    const updatedLocation = { ...location, ...updateLocation };
-    this.locations.set(id, updatedLocation);
-    return updatedLocation;
+    const [location] = await db.update(locations).set(updateLocation).where(eq(locations.id, id)).returning();
+    return location || undefined;
   }
 
   async deleteLocation(id: number): Promise<boolean> {
-    return this.locations.delete(id);
+    const result = await db.delete(locations).where(eq(locations.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
-  async getPlantings(): Promise<PlantingWithPlant[]> {
-    const plantingsArray = Array.from(this.plantings.values());
-    const plantingsWithPlants: PlantingWithPlant[] = [];
-    
-    for (const planting of plantingsArray) {
-      const plant = this.plants.get(planting.plantId);
-      if (plant) {
-        plantingsWithPlants.push({ ...planting, plant });
-      }
-    }
-    
-    return plantingsWithPlants;
+  // Planting operations
+  async getPlantings(userId: number): Promise<PlantingWithPlant[]> {
+    const result = await db
+      .select()
+      .from(plantings)
+      .leftJoin(plants, eq(plantings.plantId, plants.id))
+      .where(eq(plantings.userId, userId));
+
+    return result.map(row => ({
+      ...row.plantings,
+      plant: row.plants!
+    }));
   }
 
   async getPlanting(id: number): Promise<PlantingWithPlant | undefined> {
-    const planting = this.plantings.get(id);
-    if (!planting) return undefined;
-    
-    const plant = this.plants.get(planting.plantId);
-    if (!plant) return undefined;
-    
-    return { ...planting, plant };
+    const [result] = await db
+      .select()
+      .from(plantings)
+      .leftJoin(plants, eq(plantings.plantId, plants.id))
+      .where(eq(plantings.id, id));
+
+    if (!result) return undefined;
+
+    return {
+      ...result.plantings,
+      plant: result.plants!
+    };
   }
 
-  async createPlanting(insertPlanting: InsertPlanting): Promise<PlantingWithPlant> {
-    const id = this.currentPlantingId++;
-    const planting: Planting = { 
-      ...insertPlanting, 
-      id, 
-      status: "planted",
-      notes: insertPlanting.notes || null
-    };
-    this.plantings.set(id, planting);
+  async createPlanting(insertPlanting: InsertPlanting, userId: number): Promise<PlantingWithPlant> {
+    const [planting] = await db.insert(plantings).values({
+      ...insertPlanting,
+      userId
+    }).returning();
+
+    const plant = await this.getPlant(planting.plantId);
     
-    const plant = this.plants.get(planting.plantId)!;
-    return { ...planting, plant };
+    return {
+      ...planting,
+      plant: plant!
+    };
   }
 
   async updatePlanting(id: number, updatePlanting: Partial<InsertPlanting>): Promise<PlantingWithPlant | undefined> {
-    const planting = this.plantings.get(id);
+    const [planting] = await db.update(plantings).set(updatePlanting).where(eq(plantings.id, id)).returning();
+    
     if (!planting) return undefined;
+
+    const plant = await this.getPlant(planting.plantId);
     
-    const updatedPlanting = { ...planting, ...updatePlanting };
-    this.plantings.set(id, updatedPlanting);
-    
-    const plant = this.plants.get(updatedPlanting.plantId)!;
-    return { ...updatedPlanting, plant };
+    return {
+      ...planting,
+      plant: plant!
+    };
   }
 
   async deletePlanting(id: number): Promise<boolean> {
-    return this.plantings.delete(id);
+    const result = await db.delete(plantings).where(eq(plantings.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
-  async getStats(): Promise<{
+  // Dashboard stats
+  async getStats(userId: number): Promise<{
     activePlantings: number;
     readyHarvest: number;
     sproutingSoon: number;
     plantVarieties: number;
   }> {
-    const plantings = Array.from(this.plantings.values());
-    const today = new Date();
+    const userPlantings = await this.getPlantings(userId);
+    const now = new Date();
+
+    const activePlantings = userPlantings.filter(p => p.status !== "harvested").length;
     
-    let readyHarvest = 0;
-    let sproutingSoon = 0;
-    
-    for (const planting of plantings) {
-      const plant = this.plants.get(planting.plantId);
-      if (!plant) continue;
-      
-      const plantedDate = new Date(planting.plantedDate);
-      const daysSincePlanted = Math.floor((today.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (daysSincePlanted >= plant.daysToHarvest) {
-        readyHarvest++;
-      } else if (daysSincePlanted < plant.daysToSprout && daysSincePlanted >= plant.daysToSprout - 3) {
-        sproutingSoon++;
-      }
-    }
-    
+    const readyHarvest = userPlantings.filter(p => {
+      const plantedDate = new Date(p.plantedDate);
+      const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
+      return daysSincePlanted >= p.plant.daysToHarvest && p.status !== "harvested";
+    }).length;
+
+    const sproutingSoon = userPlantings.filter(p => {
+      const plantedDate = new Date(p.plantedDate);
+      const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
+      return daysSincePlanted >= p.plant.daysToSprout && daysSincePlanted < p.plant.daysToHarvest && p.status !== "harvested";
+    }).length;
+
+    const plantVarieties = new Set(userPlantings.map(p => p.plant.id)).size;
+
     return {
-      activePlantings: plantings.length,
+      activePlantings,
       readyHarvest,
       sproutingSoon,
-      plantVarieties: this.plants.size
+      plantVarieties
     };
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

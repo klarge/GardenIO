@@ -3,8 +3,11 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPlantSchema, insertPlantingSchema, insertLocationSchema } from "@shared/schema";
 import { z } from "zod";
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  setupAuth(app);
   // Plant routes
   app.get("/api/plants", async (req, res) => {
     try {
@@ -73,8 +76,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Planting routes
   app.get("/api/plantings", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     try {
-      const plantings = await storage.getPlantings();
+      const plantings = await storage.getPlantings(req.user!.id);
       res.json(plantings);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch plantings" });
@@ -95,9 +101,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/plantings", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     try {
       const plantingData = insertPlantingSchema.parse(req.body);
-      const planting = await storage.createPlanting(plantingData);
+      const planting = await storage.createPlanting(plantingData, req.user!.id);
       res.status(201).json(planting);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -205,8 +214,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Dashboard stats
   app.get("/api/stats", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     try {
-      const stats = await storage.getStats();
+      const stats = await storage.getStats(req.user!.id);
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch stats" });
