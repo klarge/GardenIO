@@ -83,6 +83,14 @@ The build process creates a single deployable package with the bundled server se
 ```
 Changelog:
 - July 05, 2025. Initial setup
+- July 05, 2025. Major interface restructuring:
+  * Moved planting management to dashboard with clickable Active Plantings card
+  * Added location management system with dedicated API and storage
+  * Removed Planting Tracker from navigation menu
+  * Updated button labels: "Add Planting", "Add Plant", "Add Location" (removed "New")
+  * Renamed Timeline to Calendar and moved to end of navigation menu
+  * Removed "Add Planting" button from top navigation bar
+  * Fixed location dropdown in planting forms to use real API data
 ```
 
 ## User Preferences

@@ -11,8 +11,8 @@ export function Navigation() {
   const navItems = [
     { href: "/", label: "Dashboard" },
     { href: "/library", label: "Plant Library" },
-    { href: "/timeline", label: "Timeline" },
     { href: "/locations", label: "Locations" },
+    { href: "/timeline", label: "Calendar" },
   ];
 
   const isActive = (href: string) => {
@@ -47,11 +47,6 @@ export function Navigation() {
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            <Link href="/">
-              <Button className="bg-garden-green text-white hover:bg-green-600">
-                <span className="mr-2">+</span>Add Planting
-              </Button>
-            </Link>
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">

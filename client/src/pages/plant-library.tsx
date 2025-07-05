@@ -125,7 +125,7 @@ export default function PlantLibrary() {
           <DialogTrigger asChild>
             <Button className="mt-4 sm:mt-0 bg-garden-green hover:bg-green-600">
               <Plus className="mr-2 h-4 w-4" />
-              Add New Plant
+              Add Plant
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">

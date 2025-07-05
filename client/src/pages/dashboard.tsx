@@ -144,7 +144,7 @@ export default function Dashboard() {
           onClick={() => setShowAddPlanting(true)}
           className="mt-4 sm:mt-0 bg-garden-green hover:bg-green-600"
         >
-          <span className="mr-2">+</span>Add New Planting
+          <span className="mr-2">+</span>Add Planting
         </Button>
       </div>
 

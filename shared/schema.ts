@@ -13,6 +13,12 @@ export const plants = pgTable("plants", {
   imageUrl: text("image_url"),
 });
 
+export const locations = pgTable("locations", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+});
+
 export const plantings = pgTable("plantings", {
   id: serial("id").primaryKey(),
   plantId: integer("plant_id").notNull(),
@@ -27,6 +33,10 @@ export const insertPlantSchema = createInsertSchema(plants).omit({
   id: true,
 });
 
+export const insertLocationSchema = createInsertSchema(locations).omit({
+  id: true,
+});
+
 export const insertPlantingSchema = createInsertSchema(plantings).omit({
   id: true,
   status: true,
@@ -34,6 +44,8 @@ export const insertPlantingSchema = createInsertSchema(plantings).omit({
 
 export type InsertPlant = z.infer<typeof insertPlantSchema>;
 export type Plant = typeof plants.$inferSelect;
+export type InsertLocation = z.infer<typeof insertLocationSchema>;
+export type Location = typeof locations.$inferSelect;
 export type InsertPlanting = z.infer<typeof insertPlantingSchema>;
 export type Planting = typeof plantings.$inferSelect;
 

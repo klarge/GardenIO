@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Plus, Edit, Trash2, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,32 +7,88 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-
-interface Location {
-  id: number;
-  name: string;
-  description?: string;
-}
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { Location, InsertLocation } from "@shared/schema";
 
 export default function Locations() {
-  const [locations, setLocations] = useState<Location[]>([
-    { id: 1, name: "Garden Bed A", description: "Main vegetable garden bed" },
-    { id: 2, name: "Garden Bed B", description: "Herb garden bed" },
-    { id: 3, name: "Garden Bed C", description: "Flower garden bed" },
-    { id: 4, name: "Container 1", description: "Large container on patio" },
-    { id: 5, name: "Container 2", description: "Medium container on balcony" },
-    { id: 6, name: "Container 3", description: "Small container for herbs" },
-    { id: 7, name: "Greenhouse", description: "Climate controlled greenhouse" },
-    { id: 8, name: "Indoor", description: "Indoor growing area" },
-    { id: 9, name: "Balcony", description: "Balcony container garden" },
-    { id: 10, name: "Windowsill", description: "Indoor windowsill herbs" },
-  ]);
+  const { data: locations = [], isLoading } = useQuery<Location[]>({
+    queryKey: ["/api/locations"],
+  });
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [newLocationName, setNewLocationName] = useState("");
   const [newLocationDescription, setNewLocationDescription] = useState("");
   const { toast } = useToast();
+
+  const createLocationMutation = useMutation({
+    mutationFn: async (data: InsertLocation) => {
+      const response = await apiRequest("POST", "/api/locations", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
+      setIsAddDialogOpen(false);
+      setNewLocationName("");
+      setNewLocationDescription("");
+      toast({
+        title: "Success",
+        description: "Location added successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add location",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateLocationMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertLocation> }) => {
+      const response = await apiRequest("PUT", `/api/locations/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
+      setEditingLocation(null);
+      setNewLocationName("");
+      setNewLocationDescription("");
+      toast({
+        title: "Success",
+        description: "Location updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update location",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteLocationMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/locations/${id}`);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
+      toast({
+        title: "Success",
+        description: "Location deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete location",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleAddLocation = () => {
     if (!newLocationName.trim()) {
@@ -43,20 +100,9 @@ export default function Locations() {
       return;
     }
 
-    const newLocation: Location = {
-      id: Math.max(...locations.map(l => l.id)) + 1,
+    createLocationMutation.mutate({
       name: newLocationName.trim(),
-      description: newLocationDescription.trim() || undefined,
-    };
-
-    setLocations([...locations, newLocation]);
-    setNewLocationName("");
-    setNewLocationDescription("");
-    setIsAddDialogOpen(false);
-    
-    toast({
-      title: "Success",
-      description: "Location added successfully",
+      description: newLocationDescription.trim() || null
     });
   };
 
@@ -70,28 +116,17 @@ export default function Locations() {
       return;
     }
 
-    setLocations(locations.map(loc => 
-      loc.id === editingLocation.id 
-        ? { ...loc, name: newLocationName.trim(), description: newLocationDescription.trim() || undefined }
-        : loc
-    ));
-    
-    setEditingLocation(null);
-    setNewLocationName("");
-    setNewLocationDescription("");
-    
-    toast({
-      title: "Success",
-      description: "Location updated successfully",
+    updateLocationMutation.mutate({
+      id: editingLocation.id,
+      data: {
+        name: newLocationName.trim(),
+        description: newLocationDescription.trim() || null
+      }
     });
   };
 
   const handleDeleteLocation = (id: number) => {
-    setLocations(locations.filter(loc => loc.id !== id));
-    toast({
-      title: "Success",
-      description: "Location deleted successfully",
-    });
+    deleteLocationMutation.mutate(id);
   };
 
   const openEditDialog = (location: Location) => {
@@ -112,7 +147,7 @@ export default function Locations() {
           <DialogTrigger asChild>
             <Button className="mt-4 sm:mt-0 bg-garden-green hover:bg-green-600">
               <Plus className="mr-2 h-4 w-4" />
-              Add New Location
+              Add Location
             </Button>
           </DialogTrigger>
           <DialogContent>

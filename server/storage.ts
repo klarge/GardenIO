@@ -1,4 +1,4 @@
-import { plants, plantings, type Plant, type InsertPlant, type Planting, type InsertPlanting, type PlantingWithPlant } from "@shared/schema";
+import { plants, plantings, locations, type Plant, type InsertPlant, type Planting, type InsertPlanting, type PlantingWithPlant, type Location, type InsertLocation } from "@shared/schema";
 
 export interface IStorage {
   // Plant operations
@@ -7,6 +7,13 @@ export interface IStorage {
   createPlant(plant: InsertPlant): Promise<Plant>;
   updatePlant(id: number, plant: Partial<InsertPlant>): Promise<Plant | undefined>;
   deletePlant(id: number): Promise<boolean>;
+  
+  // Location operations
+  getLocations(): Promise<Location[]>;
+  getLocation(id: number): Promise<Location | undefined>;
+  createLocation(location: InsertLocation): Promise<Location>;
+  updateLocation(id: number, location: Partial<InsertLocation>): Promise<Location | undefined>;
+  deleteLocation(id: number): Promise<boolean>;
   
   // Planting operations
   getPlantings(): Promise<PlantingWithPlant[]>;
@@ -27,17 +34,22 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private plants: Map<number, Plant>;
   private plantings: Map<number, Planting>;
+  private locations: Map<number, Location>;
   private currentPlantId: number;
   private currentPlantingId: number;
+  private currentLocationId: number;
 
   constructor() {
     this.plants = new Map();
     this.plantings = new Map();
+    this.locations = new Map();
     this.currentPlantId = 1;
     this.currentPlantingId = 1;
+    this.currentLocationId = 1;
     
-    // Initialize with some sample plants
+    // Initialize with some sample plants and locations
     this.initializeSamplePlants();
+    this.initializeSampleLocations();
   }
 
   private initializeSamplePlants() {
@@ -103,6 +115,36 @@ export class MemStorage implements IStorage {
     });
   }
 
+  private initializeSampleLocations() {
+    const sampleLocations: InsertLocation[] = [
+      {
+        name: "Front Garden",
+        description: "Sunny spot near the front entrance, good for herbs and flowers",
+      },
+      {
+        name: "Back Yard",
+        description: "Large area with full sun, perfect for vegetables",
+      },
+      {
+        name: "Greenhouse",
+        description: "Temperature controlled environment for year-round growing",
+      },
+      {
+        name: "Kitchen Window",
+        description: "Indoor herb garden on the windowsill",
+      },
+    ];
+
+    sampleLocations.forEach(location => {
+      const id = this.currentLocationId++;
+      this.locations.set(id, { 
+        ...location, 
+        id, 
+        description: location.description || null 
+      });
+    });
+  }
+
   async getPlants(): Promise<Plant[]> {
     return Array.from(this.plants.values());
   }
@@ -133,6 +175,39 @@ export class MemStorage implements IStorage {
 
   async deletePlant(id: number): Promise<boolean> {
     return this.plants.delete(id);
+  }
+
+  // Location operations
+  async getLocations(): Promise<Location[]> {
+    return Array.from(this.locations.values());
+  }
+
+  async getLocation(id: number): Promise<Location | undefined> {
+    return this.locations.get(id);
+  }
+
+  async createLocation(insertLocation: InsertLocation): Promise<Location> {
+    const id = this.currentLocationId++;
+    const location: Location = { 
+      ...insertLocation, 
+      id,
+      description: insertLocation.description || null
+    };
+    this.locations.set(id, location);
+    return location;
+  }
+
+  async updateLocation(id: number, updateLocation: Partial<InsertLocation>): Promise<Location | undefined> {
+    const location = this.locations.get(id);
+    if (!location) return undefined;
+    
+    const updatedLocation = { ...location, ...updateLocation };
+    this.locations.set(id, updatedLocation);
+    return updatedLocation;
+  }
+
+  async deleteLocation(id: number): Promise<boolean> {
+    return this.locations.delete(id);
   }
 
   async getPlantings(): Promise<PlantingWithPlant[]> {

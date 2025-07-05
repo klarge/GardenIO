@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertPlantingSchema, type InsertPlanting, type Plant } from "@shared/schema";
+import { insertPlantingSchema, type InsertPlanting, type Plant, type Location } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 
 interface PlantingFormProps {
   plants: Plant[];
@@ -16,20 +17,10 @@ interface PlantingFormProps {
   isLoading?: boolean;
 }
 
-const locations = [
-  "Garden Bed A",
-  "Garden Bed B", 
-  "Garden Bed C",
-  "Container 1",
-  "Container 2",
-  "Container 3",
-  "Greenhouse",
-  "Indoor",
-  "Balcony",
-  "Windowsill"
-];
-
 export function PlantingForm({ plants, onSubmit, initialData, isLoading }: PlantingFormProps) {
+  const { data: locations = [] } = useQuery<Location[]>({
+    queryKey: ["/api/locations"],
+  });
   const form = useForm<InsertPlanting>({
     resolver: zodResolver(insertPlantingSchema),
     defaultValues: {
@@ -91,8 +82,8 @@ export function PlantingForm({ plants, onSubmit, initialData, isLoading }: Plant
                       </FormControl>
                       <SelectContent>
                         {locations.map((location) => (
-                          <SelectItem key={location} value={location}>
-                            {location}
+                          <SelectItem key={location.id} value={location.name}>
+                            {location.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -148,6 +139,7 @@ export function PlantingForm({ plants, onSubmit, initialData, isLoading }: Plant
                     <Textarea 
                       placeholder="Any additional notes about this planting..."
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
