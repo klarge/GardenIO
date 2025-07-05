@@ -36,43 +36,23 @@ jobs:
     - name: Build web app
       run: npm run build
 
-    - name: Install Capacitor globally
+    - name: Install Capacitor CLI
       run: npm install -g @capacitor/cli
 
     - name: Install Capacitor packages
       run: npm install @capacitor/core @capacitor/android
 
-    - name: Create capacitor config
+    - name: Initialize Capacitor project
       run: |
-        cat > capacitor.config.json << 'EOF'
-        {
-          "appId": "io.garden.app",
-          "appName": "GardenIO",
-          "webDir": "dist/public",
-          "bundledWebRuntime": false,
-          "server": {
-            "androidScheme": "https"
-          }
-        }
-        EOF
-
-    - name: Initialize Capacitor
-      run: cap init --config capacitor.config.json
-
-    - name: Add Android platform
-      run: cap add android
-
-    - name: Sync Capacitor
-      run: cap sync android
-
-    - name: Accept Android licenses
-      run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+        npx cap init GardenIO io.garden.app --web-dir=dist/public
+        npx cap add android
+        npx cap sync android
 
     - name: Build APK
       working-directory: android
       run: |
         chmod +x gradlew
-        ./gradlew assembleDebug --stacktrace
+        ./gradlew assembleDebug --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
