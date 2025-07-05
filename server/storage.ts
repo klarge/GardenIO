@@ -113,7 +113,11 @@ export class MemStorage implements IStorage {
 
   async createPlant(insertPlant: InsertPlant): Promise<Plant> {
     const id = this.currentPlantId++;
-    const plant: Plant = { ...insertPlant, id };
+    const plant: Plant = { 
+      ...insertPlant, 
+      id,
+      imageUrl: insertPlant.imageUrl || null
+    };
     this.plants.set(id, plant);
     return plant;
   }
@@ -157,7 +161,12 @@ export class MemStorage implements IStorage {
 
   async createPlanting(insertPlanting: InsertPlanting): Promise<PlantingWithPlant> {
     const id = this.currentPlantingId++;
-    const planting: Planting = { ...insertPlanting, id, status: "planted" };
+    const planting: Planting = { 
+      ...insertPlanting, 
+      id, 
+      status: "planted",
+      notes: insertPlanting.notes || null
+    };
     this.plantings.set(id, planting);
     
     const plant = this.plants.get(planting.plantId)!;

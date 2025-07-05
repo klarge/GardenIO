@@ -6,8 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/navigation";
 import Dashboard from "@/pages/dashboard";
 import PlantLibrary from "@/pages/plant-library";
-import PlantingTracker from "@/pages/planting-tracker";
 import Timeline from "@/pages/timeline";
+import Locations from "@/pages/locations";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -15,8 +15,8 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/library" component={PlantLibrary} />
-      <Route path="/tracker" component={PlantingTracker} />
       <Route path="/timeline" component={Timeline} />
+      <Route path="/locations" component={Locations} />
       <Route component={NotFound} />
     </Switch>
   );

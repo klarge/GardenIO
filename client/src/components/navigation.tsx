@@ -11,8 +11,8 @@ export function Navigation() {
   const navItems = [
     { href: "/", label: "Dashboard" },
     { href: "/library", label: "Plant Library" },
-    { href: "/tracker", label: "Planting Tracker" },
     { href: "/timeline", label: "Timeline" },
+    { href: "/locations", label: "Locations" },
   ];
 
   const isActive = (href: string) => {
@@ -47,7 +47,7 @@ export function Navigation() {
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            <Link href="/tracker">
+            <Link href="/">
               <Button className="bg-garden-green text-white hover:bg-green-600">
                 <span className="mr-2">+</span>Add Planting
               </Button>
