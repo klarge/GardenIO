@@ -90,4 +90,24 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
   });
+
+  app.post("/api/change-password", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    const { currentPassword, newPassword } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      return res.status(400).send("Current password and new password are required");
+    }
+    
+    const user = await storage.getUser(req.user!.id);
+    if (!user || !(await comparePasswords(currentPassword, user.password))) {
+      return res.status(400).send("Current password is incorrect");
+    }
+    
+    const hashedNewPassword = await hashPassword(newPassword);
+    await storage.updateUserPassword(req.user!.id, hashedNewPassword);
+    
+    res.json({ message: "Password updated successfully" });
+  });
 }

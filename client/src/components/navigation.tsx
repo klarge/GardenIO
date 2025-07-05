@@ -2,11 +2,14 @@ import { Link, useLocation } from "wouter";
 import { Sprout, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { UserMenu } from "@/components/user-menu";
+import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 
 export function Navigation() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
 
   const navItems = [
     { href: "/", label: "Dashboard" },
@@ -22,13 +25,13 @@ export function Navigation() {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-slate-200">
+    <header className="bg-background shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <Sprout className="text-garden-green text-2xl mr-3" />
-              <h1 className="text-xl font-bold text-seed-dark">GardenTracker</h1>
+              <Sprout className="text-green-600 dark:text-green-400 text-2xl mr-3" />
+              <h1 className="text-xl font-bold text-foreground">GardenIO</h1>
             </div>
             <nav className="hidden md:ml-8 md:flex space-x-8">
               {navItems.map((item) => (
@@ -37,8 +40,8 @@ export function Navigation() {
                   href={item.href}
                   className={`font-medium pb-4 px-1 border-b-2 transition-colors ${
                     isActive(item.href)
-                      ? "text-garden-green border-garden-green"
-                      : "text-soil-gray border-transparent hover:text-seed-dark"
+                      ? "text-green-600 dark:text-green-400 border-green-600 dark:border-green-400"
+                      : "text-muted-foreground border-transparent hover:text-foreground"
                   }`}
                 >
                   {item.label}
@@ -47,6 +50,7 @@ export function Navigation() {
             </nav>
           </div>
           <div className="flex items-center space-x-4">
+            {user && <UserMenu />}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
@@ -62,8 +66,8 @@ export function Navigation() {
                       onClick={() => setIsOpen(false)}
                       className={`font-medium py-2 px-3 rounded-lg transition-colors ${
                         isActive(item.href)
-                          ? "text-garden-green bg-green-50"
-                          : "text-soil-gray hover:text-seed-dark hover:bg-slate-50"
+                          ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
                       }`}
                     >
                       {item.label}

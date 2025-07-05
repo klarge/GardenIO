@@ -3,9 +3,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Sprout, Apple, Clock, Edit, Trash2, MapPin, Calendar, Plus } from "lucide-react";
+import { Sprout, Apple, Clock, Edit, Trash2, MapPin, Calendar, Plus, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { getPlantingStatus, getStatusColor, formatDate, calculateSproutDate, calculateHarvestDate } from "@/lib/date-utils";
 import { PlantingForm } from "@/components/planting-form";
@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [showAddPlanting, setShowAddPlanting] = useState(false);
   const [editingPlanting, setEditingPlanting] = useState<PlantingWithPlant | null>(null);
+  const [viewingPlanting, setViewingPlanting] = useState<PlantingWithPlant | null>(null);
   const { toast } = useToast();
 
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
@@ -253,7 +254,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {filteredPlantings.map((planting) => {
               const status = getPlantingStatus(
                 new Date(planting.plantedDate),
@@ -261,85 +262,83 @@ export default function Dashboard() {
                 planting.plant.daysToHarvest
               );
               const statusColor = getStatusColor(status);
-              const sproutDate = calculateSproutDate(new Date(planting.plantedDate), planting.plant.daysToSprout);
-              const harvestDate = calculateHarvestDate(new Date(planting.plantedDate), planting.plant.daysToHarvest);
 
               return (
-                <Card key={planting.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
+                <Card key={planting.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setViewingPlanting(planting)}>
+                  <CardHeader className="pb-2">
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{planting.plant.name}</CardTitle>
-                        <div className="flex items-center text-sm text-gray-600 mt-1">
-                          <MapPin className="h-4 w-4 mr-1" />
-                          {planting.location}
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-sm truncate">{planting.plant.name}</CardTitle>
+                        <div className="flex items-center text-xs text-muted-foreground mt-1">
+                          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">{planting.location}</span>
                         </div>
                       </div>
-                      <Badge variant={statusColor as any}>{status}</Badge>
+                      <Badge variant={statusColor as any} className="text-xs">{status}</Badge>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <div className="text-gray-600">Planted</div>
-                        <div className="font-medium">{formatDate(new Date(planting.plantedDate))}</div>
-                      </div>
-                      <div>
-                        <div className="text-gray-600">Quantity</div>
-                        <div className="font-medium">{planting.quantity}</div>
-                      </div>
+                  <CardContent className="pt-0 space-y-2">
+                    <div className="text-xs text-muted-foreground">
+                      Planted: {formatDate(new Date(planting.plantedDate))}
                     </div>
-
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Expected Sprout</span>
-                        <span className="font-medium">{formatDate(sproutDate)}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600">Expected Harvest</span>
-                        <span className="font-medium">{formatDate(harvestDate)}</span>
-                      </div>
+                    <div className="text-xs text-muted-foreground">
+                      Qty: {planting.quantity}
                     </div>
-
-                    {planting.notes && (
-                      <div className="text-sm">
-                        <div className="text-gray-600 mb-1">Notes</div>
-                        <div className="text-gray-800 italic">{planting.notes}</div>
-                      </div>
-                    )}
-
+                    
                     <div className="flex items-center justify-between pt-2 border-t">
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
-                        onClick={() => handleEditPlanting(planting)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setViewingPlanting(planting);
+                        }}
+                        className="h-6 px-2 text-xs"
                       >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
                       </Button>
                       
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            Delete
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Planting</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete this {planting.plant.name} planting? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeletePlanting(planting.id)}>
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditPlanting(planting);
+                          }}
+                          className="h-6 px-2 text-xs"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-6 px-2 text-xs text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Planting</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete this {planting.plant.name} planting? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeletePlanting(planting.id)}>
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -382,6 +381,147 @@ export default function Dashboard() {
               onSubmit={(data) => updatePlantingMutation.mutate({ id: editingPlanting.id, data })}
               isLoading={updatePlantingMutation.isPending}
             />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View Planting Details Dialog */}
+      <Dialog open={!!viewingPlanting} onOpenChange={() => setViewingPlanting(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>{viewingPlanting?.plant.name} Details</DialogTitle>
+            <DialogDescription>
+              View complete information about this planting
+            </DialogDescription>
+          </DialogHeader>
+          {viewingPlanting && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Plant Image */}
+              <div className="space-y-4">
+                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                  {viewingPlanting.plant.imageUrl ? (
+                    <img
+                      src={viewingPlanting.plant.imageUrl}
+                      alt={viewingPlanting.plant.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <Sprout className="h-16 w-16" />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="font-semibold">About this plant</h3>
+                  <p className="text-sm text-muted-foreground">{viewingPlanting.plant.description}</p>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span>Category: {viewingPlanting.plant.category}</span>
+                    <span>Season: {viewingPlanting.plant.season}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Planting Details */}
+              <div className="space-y-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-lg">{viewingPlanting.plant.name}</h3>
+                    <div className="flex items-center text-sm text-muted-foreground mt-1">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {viewingPlanting.location}
+                    </div>
+                  </div>
+                  <Badge variant={getStatusColor(getPlantingStatus(
+                    new Date(viewingPlanting.plantedDate),
+                    viewingPlanting.plant.daysToSprout,
+                    viewingPlanting.plant.daysToHarvest
+                  )) as any}>
+                    {getPlantingStatus(
+                      new Date(viewingPlanting.plantedDate),
+                      viewingPlanting.plant.daysToSprout,
+                      viewingPlanting.plant.daysToHarvest
+                    )}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">Planted Date</div>
+                    <div className="text-sm text-muted-foreground">{formatDate(new Date(viewingPlanting.plantedDate))}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">Quantity</div>
+                    <div className="text-sm text-muted-foreground">{viewingPlanting.quantity} plants</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">Expected Sprout</div>
+                    <div className="text-sm text-muted-foreground">
+                      {formatDate(calculateSproutDate(new Date(viewingPlanting.plantedDate), viewingPlanting.plant.daysToSprout))}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">Expected Harvest</div>
+                    <div className="text-sm text-muted-foreground">
+                      {formatDate(calculateHarvestDate(new Date(viewingPlanting.plantedDate), viewingPlanting.plant.daysToHarvest))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="text-sm font-medium">Growing Timeline</div>
+                  <div className="text-xs text-muted-foreground">
+                    Sprouts in {viewingPlanting.plant.daysToSprout} days • Ready to harvest in {viewingPlanting.plant.daysToHarvest} days
+                  </div>
+                </div>
+
+                {viewingPlanting.notes && (
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">Notes</div>
+                    <div className="text-sm text-muted-foreground italic">{viewingPlanting.notes}</div>
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button
+                    onClick={() => {
+                      setViewingPlanting(null);
+                      handleEditPlanting(viewingPlanting);
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Planting
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="text-red-600 hover:text-red-700">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Planting</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this {viewingPlanting.plant.name} planting? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => {
+                          handleDeletePlanting(viewingPlanting.id);
+                          setViewingPlanting(null);
+                        }}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
