@@ -154,8 +154,8 @@ export default function Dashboard() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Track your garden's progress</p>
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Track your garden's progress</p>
         </div>
         <Button onClick={() => setShowAddPlanting(true)} className="bg-green-600 hover:bg-green-700">
           <Plus className="h-4 w-4 mr-2" />
