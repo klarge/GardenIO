@@ -44,7 +44,27 @@ jobs:
 
     - name: Initialize Capacitor project
       run: |
-        npx cap init GardenIO io.garden.app --web-dir=dist/public
+        # Initialize Capacitor with basic settings
+        npx cap init GardenIO io.garden.app
+        
+        # Create capacitor.config.ts with proper settings
+        cat > capacitor.config.ts << 'EOF'
+        import { CapacitorConfig } from '@capacitor/cli';
+        
+        const config: CapacitorConfig = {
+          appId: 'io.garden.app',
+          appName: 'GardenIO',
+          webDir: 'dist/public',
+          bundledWebRuntime: false,
+          server: {
+            androidScheme: 'https'
+          }
+        };
+        
+        export default config;
+        EOF
+        
+        # Add Android platform and sync
         npx cap add android
         npx cap sync android
 
