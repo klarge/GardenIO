@@ -89,9 +89,10 @@ docker run -p 5000:5000 \
 
 The project includes GitHub Actions for building Android apps using Capacitor:
 
-- **APK Generation**: Debug APKs are built for every push
-- **Java 11 Compatibility**: Configured for stable Android builds
-- **Automatic Releases**: GitHub releases are created with downloadable APKs
+- **APK Generation**: Debug APKs can be built manually or on releases
+- **Java 17 Compatibility**: Configured for modern Android builds
+- **Manual Triggers**: Build APKs on-demand via GitHub Actions workflow_dispatch
+- **Automatic Releases**: GitHub releases are created with downloadable APKs for tagged versions
 
 To build locally:
 ```bash

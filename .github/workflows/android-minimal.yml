@@ -1,0 +1,73 @@
+name: Build Android APK (Minimal)
+
+on:
+  workflow_dispatch:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build web app
+      run: npm run build
+
+    - name: Set up Capacitor
+      run: |
+        npm install -g @capacitor/cli
+        npm install @capacitor/core @capacitor/android
+
+    - name: Initialize Capacitor
+      run: |
+        npx cap init GardenIO io.garden.app --web-dir=dist/public
+        npx cap add android
+
+    - name: Sync Capacitor
+      run: npx cap sync android
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 33
+        target: default
+        arch: x86_64
+
+    - name: Build debug APK
+      working-directory: android
+      run: |
+        chmod +x gradlew
+        ./gradlew assembleDebug --stacktrace --info
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: gardenio-android-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: android/app/build/outputs/apk/debug/app-debug.apk
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
