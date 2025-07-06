@@ -25,6 +25,7 @@ A comprehensive gardening web application with user authentication, plant librar
 
 ### Using Docker (Recommended)
 
+#### Option 1: Docker Compose (Multi-container)
 1. Clone the repository:
 ```bash
 git clone https://github.com/klarge/GardenIO.git
@@ -34,6 +35,19 @@ cd GardenIO
 2. Run with Docker Compose:
 ```bash
 docker-compose up -d
+```
+
+3. Access the application at `http://localhost:5000`
+
+#### Option 2: Standalone Docker Image (Single container)
+1. Build the standalone image:
+```bash
+docker build -f Dockerfile.standalone -t gardenio-standalone .
+```
+
+2. Run the standalone container:
+```bash
+docker run -d -p 5000:5000 -v gardenio-data:/var/lib/postgresql/data -v gardenio-uploads:/app/uploads --name gardenio gardenio-standalone
 ```
 
 3. Access the application at `http://localhost:5000`
@@ -67,18 +81,35 @@ npm run dev
 
 ### Docker
 
-The application includes GitHub Actions for automatic Docker image building:
+The application includes multiple Docker deployment options:
 
-- **GitHub Container Registry**: Images are automatically built and pushed to GitHub Container Registry
-- **AMD64 Architecture**: Optimized builds for Linux AMD64 systems
-- **Production ready**: Optimized for deployment with health checks
+#### Multi-container Setup (Docker Compose)
+- **Separate containers**: Application and PostgreSQL in separate containers
+- **Health checks**: Database health monitoring with automatic waiting
+- **Persistent storage**: Data persists across container restarts
+- **Easy scaling**: Can easily scale components independently
 
-To deploy manually:
+#### Standalone Container
+- **Single container**: Application and PostgreSQL in one container
+- **Self-contained**: No external dependencies required
+- **Embedded database**: PostgreSQL runs inside the application container
+- **Simplified deployment**: One image contains everything needed
+
+#### GitHub Actions Integration
+- **Automated builds**: Images automatically built and pushed to GitHub Container Registry
+- **AMD64 architecture**: Optimized builds for Linux AMD64 systems
+- **Production ready**: Health checks and proper startup sequences
+
+**Manual deployment examples:**
 ```bash
-# Build the image
-docker build -t gardenio .
+# Multi-container with Docker Compose
+docker-compose up -d
 
-# Run with external database
+# Standalone container
+docker build -f Dockerfile.standalone -t gardenio-standalone .
+docker run -d -p 5000:5000 --name gardenio gardenio-standalone
+
+# Using external database
 docker run -p 5000:5000 \
   -e DATABASE_URL="your-database-url" \
   -e SESSION_SECRET="your-session-secret" \

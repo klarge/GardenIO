@@ -1,4 +1,4 @@
-# Build stage
+# Standalone GardenIO Docker image with embedded PostgreSQL
 FROM node:20-alpine AS build
 
 WORKDIR /app
@@ -23,8 +23,11 @@ COPY drizzle.config.ts ./
 # Build both frontend and backend
 RUN npm run build
 
-# Production stage
+# Production stage with PostgreSQL
 FROM node:20-alpine AS production
+
+# Install PostgreSQL, bash, and su-exec
+RUN apk add --no-cache postgresql postgresql-contrib bash su-exec
 
 WORKDIR /app
 
@@ -40,32 +43,38 @@ COPY --from=build /app/dist ./dist
 # Copy shared files and config
 COPY shared ./shared
 COPY drizzle.config.ts ./
+COPY init-db.sql ./
 
 # Copy startup script
-COPY docker-start.sh ./
-RUN chmod +x docker-start.sh
+COPY docker-standalone-start.sh ./
+RUN chmod +x docker-standalone-start.sh
 
 # Create uploads directory
 RUN mkdir -p uploads
 
-# Install wait-for-it script for database readiness
-ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /usr/local/bin/wait-for-it
-RUN chmod +x /usr/local/bin/wait-for-it
+# Create postgres user and database directories
+RUN adduser -D -s /bin/sh postgres && \
+    mkdir -p /var/lib/postgresql/data && \
+    chown -R postgres:postgres /var/lib/postgresql/data && \
+    mkdir -p /run/postgresql && \
+    chown -R postgres:postgres /run/postgresql
 
-# Create non-root user
+# Create non-root user for the app
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S gardenio -u 1001
 
-# Change ownership of the app directory
-RUN chown -R gardenio:nodejs /app
-USER gardenio
+# Set environment variables
+ENV DATABASE_URL=postgresql://gardenio:gardenio123@localhost:5432/gardenio
+ENV SESSION_SECRET=your-super-secret-session-key-change-in-production
+ENV NODE_ENV=production
+ENV PGDATA=/var/lib/postgresql/data
 
-# Expose port
-EXPOSE 5000
+# Expose ports
+EXPOSE 5000 5432
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
   CMD node -e "require('http').get('http://localhost:5000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
 
-# Start the application with the startup script
-CMD ["./docker-start.sh"]
+# Start the application with the standalone startup script
+CMD ["./docker-standalone-start.sh"]

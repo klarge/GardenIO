@@ -79,11 +79,12 @@ The application is configured for deployment with multiple options:
 - **Database**: Uses Neon Database for serverless PostgreSQL hosting
 
 ### Docker Containerization
-- **Multi-stage Build**: Optimized Docker builds with separate frontend and backend stages
+- **Multi-container Setup**: Docker Compose with separate app and PostgreSQL containers
+- **Standalone Container**: Single container with embedded PostgreSQL database
+- **Auto-initialization**: Database schema and sample data automatically created
 - **Health Checks**: Built-in health monitoring for production deployments
-- **Docker Compose**: Complete stack with PostgreSQL for local development
+- **Database Migrations**: Automatic schema updates via Drizzle migrations
 - **GitHub Actions**: Automated Docker image building and publishing to GitHub Container Registry
-- **Multi-platform**: Supports both AMD64 and ARM64 architectures
 
 ### Android App Packaging
 - **Capacitor Integration**: Uses Capacitor to wrap the web app as a native Android app
@@ -130,7 +131,10 @@ Changelog:
   * Created health check endpoints for production monitoring
   * Added comprehensive README with deployment instructions
   * Fixed GitHub Actions workflows for reliable Docker and Android builds
-  * Configured Java 11 compatibility for stable Android compilation
+  * Configured Java 17 compatibility for stable Android compilation
+  * Created standalone Docker image with embedded PostgreSQL database
+  * Added automatic database initialization and schema migration
+  * Fixed image upload functionality for plant photos
 ```
 
 ## User Preferences
