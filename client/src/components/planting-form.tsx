@@ -9,6 +9,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
+import { useGarden } from "@/hooks/use-garden";
+import { apiRequest } from "@/lib/queryClient";
 
 interface PlantingFormProps {
   plants: Plant[];
@@ -18,9 +20,16 @@ interface PlantingFormProps {
 }
 
 export function PlantingForm({ plants, onSubmit, initialData, isLoading }: PlantingFormProps) {
+  const { currentGarden } = useGarden();
   const { data: locations = [] } = useQuery<Location[]>({
-    queryKey: ["/api/locations"],
+    queryKey: ["/api/locations", currentGarden?.id],
+    enabled: !!currentGarden,
+    queryFn: async () => {
+      const response = await apiRequest("GET", `/api/locations?gardenId=${currentGarden!.id}`);
+      return response.json();
+    },
   });
+
   const form = useForm<InsertPlanting>({
     resolver: zodResolver(insertPlantingSchema),
     defaultValues: {
@@ -29,6 +38,7 @@ export function PlantingForm({ plants, onSubmit, initialData, isLoading }: Plant
       plantedDate: initialData?.plantedDate || format(new Date(), "yyyy-MM-dd"),
       quantity: initialData?.quantity || 1,
       notes: initialData?.notes || "",
+      gardenId: currentGarden?.id || 0,
     },
   });
 

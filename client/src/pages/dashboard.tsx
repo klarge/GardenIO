@@ -9,7 +9,9 @@ import { Sprout, Apple, Clock, Edit, Trash2, MapPin, Calendar, Plus, Eye } from 
 import { formatDistanceToNow } from "date-fns";
 import { getPlantingStatus, getStatusColor, formatDate, calculateSproutDate, calculateHarvestDate } from "@/lib/date-utils";
 import { PlantingForm } from "@/components/planting-form";
+import { HarvestDialog } from "@/components/harvest-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useGarden } from "@/hooks/use-garden";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import type { PlantingWithPlant, Plant, InsertPlanting } from "@shared/schema";
@@ -28,14 +30,26 @@ export default function Dashboard() {
   const [showAddPlanting, setShowAddPlanting] = useState(false);
   const [editingPlanting, setEditingPlanting] = useState<PlantingWithPlant | null>(null);
   const [viewingPlanting, setViewingPlanting] = useState<PlantingWithPlant | null>(null);
+  const [harvestingPlanting, setHarvestingPlanting] = useState<PlantingWithPlant | null>(null);
   const { toast } = useToast();
+  const { currentGarden } = useGarden();
 
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
-    queryKey: ["/api/stats"],
+    queryKey: ["/api/stats", currentGarden?.id],
+    enabled: !!currentGarden,
+    queryFn: async () => {
+      const response = await apiRequest("GET", `/api/stats?gardenId=${currentGarden!.id}`);
+      return response.json();
+    },
   });
 
   const { data: plantings = [], isLoading: plantingsLoading } = useQuery<PlantingWithPlant[]>({
-    queryKey: ["/api/plantings"],
+    queryKey: ["/api/plantings", currentGarden?.id],
+    enabled: !!currentGarden,
+    queryFn: async () => {
+      const response = await apiRequest("GET", `/api/plantings?gardenId=${currentGarden!.id}`);
+      return response.json();
+    },
   });
 
   const { data: plants = [] } = useQuery<Plant[]>({
@@ -48,8 +62,8 @@ export default function Dashboard() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/plantings"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plantings", currentGarden?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats", currentGarden?.id] });
       setShowAddPlanting(false);
       toast({
         title: "Success",
@@ -71,8 +85,8 @@ export default function Dashboard() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/plantings"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plantings", currentGarden?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats", currentGarden?.id] });
       setEditingPlanting(null);
       toast({
         title: "Success",
@@ -93,8 +107,8 @@ export default function Dashboard() {
       await apiRequest("DELETE", `/api/plantings/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/plantings"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plantings", currentGarden?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats", currentGarden?.id] });
       toast({
         title: "Success",
         description: "Planting deleted successfully!",
@@ -300,6 +314,19 @@ export default function Dashboard() {
                       </Button>
                       
                       <div className="flex gap-1">
+                        {status === "Ready to Harvest" && planting.status !== "harvested" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setHarvestingPlanting(planting);
+                            }}
+                            className="h-6 px-2 text-xs text-green-600 hover:text-green-700"
+                          >
+                            <Apple className="h-3 w-3" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
@@ -525,6 +552,15 @@ export default function Dashboard() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Harvest Dialog */}
+      {harvestingPlanting && (
+        <HarvestDialog
+          planting={harvestingPlanting}
+          isOpen={!!harvestingPlanting}
+          onClose={() => setHarvestingPlanting(null)}
+        />
+      )}
     </div>
   );
 }

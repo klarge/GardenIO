@@ -3,6 +3,7 @@ import { Sprout, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserMenu } from "@/components/user-menu";
+import { GardenSelector } from "@/components/garden-selector";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 
@@ -50,6 +51,7 @@ export function Navigation() {
             </nav>
           </div>
           <div className="flex items-center space-x-4">
+            {user && <GardenSelector />}
             {user && <UserMenu />}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>

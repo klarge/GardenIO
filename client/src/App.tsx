@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/navigation";
 import { AuthProvider } from "@/hooks/use-auth";
+import { GardenProvider } from "@/hooks/use-garden";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ThemeProvider } from "@/lib/theme-provider";
 import Dashboard from "@/pages/dashboard";
@@ -32,15 +33,17 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <TooltipProvider>
-            <div className="min-h-screen bg-background text-foreground">
-              <Navigation />
-              <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Router />
-              </main>
-            </div>
-            <Toaster />
-          </TooltipProvider>
+          <GardenProvider>
+            <TooltipProvider>
+              <div className="min-h-screen bg-background text-foreground">
+                <Navigation />
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                  <Router />
+                </main>
+              </div>
+              <Toaster />
+            </TooltipProvider>
+          </GardenProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

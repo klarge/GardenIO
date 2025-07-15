@@ -1,4 +1,4 @@
-import { plants, plantings, locations, users, type Plant, type InsertPlant, type Planting, type InsertPlanting, type PlantingWithPlant, type Location, type InsertLocation, type User, type InsertUser } from "@shared/schema";
+import { plants, plantings, locations, users, gardens, gardenCollaborators, type Plant, type InsertPlant, type Planting, type InsertPlanting, type PlantingWithPlant, type Location, type InsertLocation, type User, type InsertUser, type Garden, type InsertGarden, type GardenCollaborator, type InsertGardenCollaborator, type GardenWithCollaborators, type HarvestPlanting } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import session from "express-session";
@@ -21,22 +21,35 @@ export interface IStorage {
   updatePlant(id: number, plant: Partial<InsertPlant>): Promise<Plant | undefined>;
   deletePlant(id: number): Promise<boolean>;
   
+  // Garden operations
+  getGardensForUser(userId: number): Promise<GardenWithCollaborators[]>;
+  getGarden(gardenId: number): Promise<GardenWithCollaborators | undefined>;
+  createGarden(garden: InsertGarden, ownerId: number): Promise<Garden>;
+  updateGarden(gardenId: number, garden: Partial<InsertGarden>): Promise<Garden | undefined>;
+  deleteGarden(gardenId: number): Promise<boolean>;
+  
+  // Collaborator operations
+  addCollaborator(gardenId: number, userId: number): Promise<GardenCollaborator>;
+  removeCollaborator(gardenId: number, userId: number): Promise<boolean>;
+  getCollaborators(gardenId: number): Promise<(GardenCollaborator & { user: User })[]>;
+  
   // Location operations
-  getLocations(): Promise<Location[]>;
+  getLocations(gardenId: number): Promise<Location[]>;
   getLocation(id: number): Promise<Location | undefined>;
   createLocation(location: InsertLocation): Promise<Location>;
   updateLocation(id: number, location: Partial<InsertLocation>): Promise<Location | undefined>;
   deleteLocation(id: number): Promise<boolean>;
   
   // Planting operations
-  getPlantings(userId: number): Promise<PlantingWithPlant[]>;
+  getPlantings(gardenId: number): Promise<PlantingWithPlant[]>;
   getPlanting(id: number): Promise<PlantingWithPlant | undefined>;
   createPlanting(planting: InsertPlanting, userId: number): Promise<PlantingWithPlant>;
   updatePlanting(id: number, planting: Partial<InsertPlanting>): Promise<PlantingWithPlant | undefined>;
   deletePlanting(id: number): Promise<boolean>;
+  harvestPlanting(id: number, harvestData: HarvestPlanting): Promise<PlantingWithPlant | undefined>;
   
   // Dashboard stats
-  getStats(userId: number): Promise<{
+  getStats(gardenId: number): Promise<{
     activePlantings: number;
     readyHarvest: number;
     sproutingSoon: number;
@@ -126,23 +139,33 @@ export class DatabaseStorage implements IStorage {
         await this.createPlant(plant);
       }
 
-      // Add sample locations
+      // Create a default garden for the default user
+      const defaultGarden = await this.createGarden({
+        name: "My Garden",
+        description: "Default garden for getting started"
+      }, 1);
+
+      // Add sample locations for the default garden
       const sampleLocations = [
         {
           name: "Front Garden",
           description: "Sunny spot near the front entrance, good for herbs and flowers",
+          gardenId: defaultGarden.id
         },
         {
           name: "Back Yard",
           description: "Large area with full sun, perfect for vegetables",
+          gardenId: defaultGarden.id
         },
         {
           name: "Greenhouse",
           description: "Temperature controlled environment for year-round growing",
+          gardenId: defaultGarden.id
         },
         {
           name: "Kitchen Window",
           description: "Indoor herb garden on the windowsill",
+          gardenId: defaultGarden.id
         },
       ];
 
@@ -177,6 +200,81 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id));
   }
 
+  // Garden operations
+  async getGardensForUser(userId: number): Promise<GardenWithCollaborators[]> {
+    const userGardens = await db.select().from(gardens).where(eq(gardens.ownerId, userId));
+    const collaborativeGardens = await db.select({
+      id: gardens.id,
+      name: gardens.name,
+      description: gardens.description,
+      ownerId: gardens.ownerId,
+      createdAt: gardens.createdAt,
+    }).from(gardens)
+      .innerJoin(gardenCollaborators, eq(gardens.id, gardenCollaborators.gardenId))
+      .where(eq(gardenCollaborators.userId, userId));
+    
+    const allGardens = [...userGardens, ...collaborativeGardens];
+    
+    const result = [];
+    for (const garden of allGardens) {
+      const collaborators = await this.getCollaborators(garden.id);
+      result.push({ ...garden, collaborators });
+    }
+    
+    return result;
+  }
+
+  async getGarden(gardenId: number): Promise<GardenWithCollaborators | undefined> {
+    const [garden] = await db.select().from(gardens).where(eq(gardens.id, gardenId));
+    if (!garden) return undefined;
+    
+    const collaborators = await this.getCollaborators(gardenId);
+    return { ...garden, collaborators };
+  }
+
+  async createGarden(insertGarden: InsertGarden, ownerId: number): Promise<Garden> {
+    const [garden] = await db.insert(gardens).values({ ...insertGarden, ownerId }).returning();
+    return garden;
+  }
+
+  async updateGarden(gardenId: number, updateGarden: Partial<InsertGarden>): Promise<Garden | undefined> {
+    const [garden] = await db.update(gardens).set(updateGarden).where(eq(gardens.id, gardenId)).returning();
+    return garden || undefined;
+  }
+
+  async deleteGarden(gardenId: number): Promise<boolean> {
+    const result = await db.delete(gardens).where(eq(gardens.id, gardenId));
+    return result.rowCount > 0;
+  }
+
+  // Collaborator operations
+  async addCollaborator(gardenId: number, userId: number): Promise<GardenCollaborator> {
+    const [collaborator] = await db.insert(gardenCollaborators).values({ gardenId, userId }).returning();
+    return collaborator;
+  }
+
+  async removeCollaborator(gardenId: number, userId: number): Promise<boolean> {
+    const result = await db.delete(gardenCollaborators)
+      .where(eq(gardenCollaborators.gardenId, gardenId))
+      .where(eq(gardenCollaborators.userId, userId));
+    return result.rowCount > 0;
+  }
+
+  async getCollaborators(gardenId: number): Promise<(GardenCollaborator & { user: User })[]> {
+    const collaborators = await db.select({
+      id: gardenCollaborators.id,
+      gardenId: gardenCollaborators.gardenId,
+      userId: gardenCollaborators.userId,
+      role: gardenCollaborators.role,
+      createdAt: gardenCollaborators.createdAt,
+      user: users,
+    }).from(gardenCollaborators)
+      .innerJoin(users, eq(gardenCollaborators.userId, users.id))
+      .where(eq(gardenCollaborators.gardenId, gardenId));
+    
+    return collaborators;
+  }
+
   // Plant operations
   async getPlants(): Promise<Plant[]> {
     return await db.select().from(plants);
@@ -203,8 +301,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Location operations
-  async getLocations(): Promise<Location[]> {
-    return await db.select().from(locations);
+  async getLocations(gardenId: number): Promise<Location[]> {
+    return await db.select().from(locations).where(eq(locations.gardenId, gardenId));
   }
 
   async getLocation(id: number): Promise<Location | undefined> {
@@ -228,12 +326,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Planting operations
-  async getPlantings(userId: number): Promise<PlantingWithPlant[]> {
+  async getPlantings(gardenId: number): Promise<PlantingWithPlant[]> {
     const result = await db
       .select()
       .from(plantings)
       .leftJoin(plants, eq(plantings.plantId, plants.id))
-      .where(eq(plantings.userId, userId));
+      .where(eq(plantings.gardenId, gardenId));
 
     return result.map(row => ({
       ...row.plantings,
@@ -288,31 +386,49 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount !== null && result.rowCount > 0;
   }
 
+  async harvestPlanting(id: number, harvestData: HarvestPlanting): Promise<PlantingWithPlant | undefined> {
+    const [planting] = await db.update(plantings).set({
+      status: "harvested",
+      harvestedDate: harvestData.harvestedDate,
+      harvestedQuantity: harvestData.harvestedQuantity,
+      harvestedNotes: harvestData.harvestedNotes,
+    }).where(eq(plantings.id, id)).returning();
+    
+    if (!planting) return undefined;
+
+    const plant = await this.getPlant(planting.plantId);
+    
+    return {
+      ...planting,
+      plant: plant!
+    };
+  }
+
   // Dashboard stats
-  async getStats(userId: number): Promise<{
+  async getStats(gardenId: number): Promise<{
     activePlantings: number;
     readyHarvest: number;
     sproutingSoon: number;
     plantVarieties: number;
   }> {
-    const userPlantings = await this.getPlantings(userId);
+    const gardenPlantings = await this.getPlantings(gardenId);
     const now = new Date();
 
-    const activePlantings = userPlantings.filter(p => p.status !== "harvested").length;
+    const activePlantings = gardenPlantings.filter(p => p.status !== "harvested").length;
     
-    const readyHarvest = userPlantings.filter(p => {
+    const readyHarvest = gardenPlantings.filter(p => {
       const plantedDate = new Date(p.plantedDate);
       const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
       return daysSincePlanted >= p.plant.daysToHarvest && p.status !== "harvested";
     }).length;
 
-    const sproutingSoon = userPlantings.filter(p => {
+    const sproutingSoon = gardenPlantings.filter(p => {
       const plantedDate = new Date(p.plantedDate);
       const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
       return daysSincePlanted >= p.plant.daysToSprout && daysSincePlanted < p.plant.daysToHarvest && p.status !== "harvested";
     }).length;
 
-    const plantVarieties = new Set(userPlantings.map(p => p.plant.id)).size;
+    const plantVarieties = new Set(gardenPlantings.map(p => p.plant.id)).size;
 
     return {
       activePlantings,

@@ -7,12 +7,19 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useGarden } from "@/hooks/use-garden";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Location, InsertLocation } from "@shared/schema";
 
 export default function Locations() {
+  const { currentGarden } = useGarden();
   const { data: locations = [], isLoading } = useQuery<Location[]>({
-    queryKey: ["/api/locations"],
+    queryKey: ["/api/locations", currentGarden?.id],
+    enabled: !!currentGarden,
+    queryFn: async () => {
+      const response = await apiRequest("GET", `/api/locations?gardenId=${currentGarden!.id}`);
+      return response.json();
+    },
   });
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -23,11 +30,12 @@ export default function Locations() {
 
   const createLocationMutation = useMutation({
     mutationFn: async (data: InsertLocation) => {
-      const response = await apiRequest("POST", "/api/locations", data);
+      const locationData = { ...data, gardenId: currentGarden!.id };
+      const response = await apiRequest("POST", "/api/locations", locationData);
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/locations", currentGarden?.id] });
       setIsAddDialogOpen(false);
       setNewLocationName("");
       setNewLocationDescription("");
@@ -51,7 +59,7 @@ export default function Locations() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/locations", currentGarden?.id] });
       setEditingLocation(null);
       setNewLocationName("");
       setNewLocationDescription("");
@@ -75,7 +83,7 @@ export default function Locations() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/locations", currentGarden?.id] });
       toast({
         title: "Success",
         description: "Location deleted successfully",
