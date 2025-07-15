@@ -25,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { insertGardenSchema, InsertGarden } from "@shared/schema";
 import { ChevronDown, Plus, Sprout } from "lucide-react";
+import { GardenSettings } from "./garden-settings";
 
 export function GardenSelector() {
   const { currentGarden, gardens, setCurrentGarden, createGardenMutation } = useGarden();
@@ -79,6 +80,14 @@ export function GardenSelector() {
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
+          {currentGarden && (
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <GardenSettings 
+                gardenId={currentGarden.id} 
+                gardenName={currentGarden.name} 
+              />
+            </DropdownMenuItem>
+          )}
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

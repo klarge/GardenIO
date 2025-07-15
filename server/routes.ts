@@ -47,6 +47,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
+  // Users API endpoint
+  app.get("/api/users", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
   // Image upload endpoint
   app.post('/api/upload-image', upload.single('image'), (req, res) => {
     if (!req.isAuthenticated()) {
@@ -299,6 +310,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/plantings/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const plantingData = insertPlantingSchema.partial().parse(req.body);
+      const planting = await storage.updatePlanting(id, plantingData);
+      if (!planting) {
+        return res.status(404).json({ message: "Planting not found" });
+      }
+      res.json(planting);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid planting data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update planting" });
+    }
+  });
+
+  app.patch("/api/plantings/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const plantingData = insertPlantingSchema.partial().parse(req.body);
