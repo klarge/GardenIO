@@ -332,18 +332,6 @@ The application uses PostgreSQL with the following main tables:
 - **locations**: Garden locations and areas
 - **plantings**: Individual planting records with dates and quantities
 
-## 🤝 Contributing
-
-We welcome contributions! Here's how to get started:
-
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Make your changes**: Follow the existing code style and patterns
-4. **Test thoroughly**: Ensure all features work as expected
-5. **Commit your changes**: `git commit -m 'Add some amazing feature'`
-6. **Push to the branch**: `git push origin feature/amazing-feature`
-7. **Open a Pull Request**: Describe your changes and why they're needed
-
 ### Development Guidelines
 - Follow TypeScript best practices
 - Use the existing component patterns (shadcn/ui)
@@ -369,17 +357,8 @@ We welcome contributions! Here's how to get started:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support & Community
+## 🆘 Support
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/klarge/GardenIO/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/klarge/GardenIO/discussions)
-- 📖 **Documentation**: [Project Wiki](https://github.com/klarge/GardenIO/wiki)
-- 🔧 **Development**: Check out [DEPLOYMENT.md](DEPLOYMENT.md) for detailed setup instructions
-
-## 🌟 Star History
-
-If you find GardenIO helpful, please consider giving it a star on GitHub! Your support helps the project grow and reach more gardeners.
-
----
+...there is none. Feel free to ask but no guarantee.
 
 **Happy Gardening!** 🌱✨
