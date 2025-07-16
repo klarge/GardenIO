@@ -2,7 +2,7 @@
 
 A comprehensive gardening web and mobile application that empowers users to manage their plant library, track seed planting progress, and optimize garden planning with collaborative and interactive features.
 
-![GardenIO Dashboard](https://github.com/klarge/GardenIO/blob/main/docs/screenshots/dashboard.png?raw=true)
+![GardenIO Dashboard](docs/screenshots/dashboard.svg)
 
 ## ✨ Key Features
 
@@ -14,7 +14,7 @@ A comprehensive gardening web and mobile application that empowers users to mana
 - **Status Filtering**: Filter plantings by status (Active, Ready to Harvest, Sprouting Soon)
 
 ### 🌿 **Plant Library Management**
-![Plant Library](https://github.com/klarge/GardenIO/blob/main/docs/screenshots/plant-library.png?raw=true)
+![Plant Library](docs/screenshots/plant-library.svg)
 - **Comprehensive Plant Database**: Manage plant varieties with detailed information
 - **Image Support**: Upload plant photos or use web URLs
 - **Growth Tracking**: Track days to sprout and days to harvest
@@ -28,7 +28,7 @@ A comprehensive gardening web and mobile application that empowers users to mana
 - **Garden Switching**: Easily switch between different gardens with dropdown selector
 
 ### 📍 **Location Management**
-![Location Management](https://github.com/klarge/GardenIO/blob/main/docs/screenshots/locations.png?raw=true)
+![Location Management](docs/screenshots/locations.svg)
 - **Organize by Location**: Track plantings across different areas (raised beds, containers, etc.)
 - **Location Details**: Add descriptions and notes for each growing location
 - **Visual Organization**: See which plants are growing where
@@ -51,6 +51,7 @@ A comprehensive gardening web and mobile application that empowers users to mana
 - **Real-time Updates**: Live data synchronization across all views
 
 ### 📱 **Mobile App**
+![Mobile App](docs/screenshots/mobile-app.svg)
 - **Android App**: Native Android application with full feature parity
 - **Server Configuration**: Connect to self-hosted instances with custom server URLs
 - **Offline Ready**: Works with cached data when connection is limited

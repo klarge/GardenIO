@@ -1,0 +1,109 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="60" fill="#1f2937"/>
+  <text x="20" y="35" font-family="Arial, sans-serif" font-size="18" fill="white" font-weight="bold">Garden Locations</text>
+  <rect x="650" y="15" width="130" height="30" fill="#3b82f6" rx="4"/>
+  <text x="715" y="33" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">+ Add Location</text>
+  
+  <!-- Garden Selector -->
+  <rect x="20" y="80" width="200" height="40" fill="white" stroke="#e5e7eb" rx="8"/>
+  <text x="30" y="103" font-family="Arial, sans-serif" font-size="14" fill="#374151">My Garden</text>
+  <text x="200" y="103" font-family="Arial, sans-serif" font-size="14" fill="#6b7280" text-anchor="end">▼</text>
+  
+  <!-- Location Cards -->
+  <!-- Location 1 - Greenhouse -->
+  <rect x="20" y="140" width="240" height="120" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="30" y="150" width="40" height="40" fill="#10b981" rx="8"/>
+  <text x="50" y="175" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">🏠</text>
+  <text x="80" y="165" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">Greenhouse</text>
+  <text x="80" y="180" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Protected growing space</text>
+  <text x="30" y="205" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Size: 10x12 feet</text>
+  <text x="30" y="220" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Type: Indoor/Controlled</text>
+  <text x="30" y="235" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Active Plantings: 12</text>
+  <rect x="200" y="200" width="50" height="20" fill="#f3f4f6" stroke="#e5e7eb" rx="4"/>
+  <text x="225" y="212" font-family="Arial, sans-serif" font-size="9" fill="#374151" text-anchor="middle">Edit</text>
+  <rect x="200" y="225" width="50" height="20" fill="#fee2e2" stroke="#fecaca" rx="4"/>
+  <text x="225" y="237" font-family="Arial, sans-serif" font-size="9" fill="#dc2626" text-anchor="middle">Delete</text>
+  
+  <!-- Location 2 - Vegetable Beds -->
+  <rect x="280" y="140" width="240" height="120" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="290" y="150" width="40" height="40" fill="#3b82f6" rx="8"/>
+  <text x="310" y="175" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">🌱</text>
+  <text x="340" y="165" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">Vegetable Beds</text>
+  <text x="340" y="180" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Raised beds for vegetables</text>
+  <text x="290" y="205" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Size: 4x8 feet (6 beds)</text>
+  <text x="290" y="220" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Type: Outdoor/Raised</text>
+  <text x="290" y="235" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Active Plantings: 24</text>
+  <rect x="460" y="200" width="50" height="20" fill="#f3f4f6" stroke="#e5e7eb" rx="4"/>
+  <text x="485" y="212" font-family="Arial, sans-serif" font-size="9" fill="#374151" text-anchor="middle">Edit</text>
+  <rect x="460" y="225" width="50" height="20" fill="#fee2e2" stroke="#fecaca" rx="4"/>
+  <text x="485" y="237" font-family="Arial, sans-serif" font-size="9" fill="#dc2626" text-anchor="middle">Delete</text>
+  
+  <!-- Location 3 - Herb Garden -->
+  <rect x="540" y="140" width="240" height="120" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="550" y="150" width="40" height="40" fill="#8b5cf6" rx="8"/>
+  <text x="570" y="175" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">🌿</text>
+  <text x="600" y="165" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">Herb Garden</text>
+  <text x="600" y="180" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Dedicated herb growing area</text>
+  <text x="550" y="205" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Size: 6x6 feet</text>
+  <text x="550" y="220" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Type: Outdoor/Ground</text>
+  <text x="550" y="235" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Active Plantings: 8</text>
+  <rect x="720" y="200" width="50" height="20" fill="#f3f4f6" stroke="#e5e7eb" rx="4"/>
+  <text x="745" y="212" font-family="Arial, sans-serif" font-size="9" fill="#374151" text-anchor="middle">Edit</text>
+  <rect x="720" y="225" width="50" height="20" fill="#fee2e2" stroke="#fecaca" rx="4"/>
+  <text x="745" y="237" font-family="Arial, sans-serif" font-size="9" fill="#dc2626" text-anchor="middle">Delete</text>
+  
+  <!-- Location 4 - Container Garden -->
+  <rect x="20" y="280" width="240" height="120" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="30" y="290" width="40" height="40" fill="#f59e0b" rx="8"/>
+  <text x="50" y="315" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">🪴</text>
+  <text x="80" y="305" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">Container Garden</text>
+  <text x="80" y="320" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Pots and containers</text>
+  <text x="30" y="345" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Size: Various containers</text>
+  <text x="30" y="360" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Type: Mobile/Portable</text>
+  <text x="30" y="375" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Active Plantings: 6</text>
+  <rect x="200" y="340" width="50" height="20" fill="#f3f4f6" stroke="#e5e7eb" rx="4"/>
+  <text x="225" y="352" font-family="Arial, sans-serif" font-size="9" fill="#374151" text-anchor="middle">Edit</text>
+  <rect x="200" y="365" width="50" height="20" fill="#fee2e2" stroke="#fecaca" rx="4"/>
+  <text x="225" y="377" font-family="Arial, sans-serif" font-size="9" fill="#dc2626" text-anchor="middle">Delete</text>
+  
+  <!-- Location 5 - Compost Area -->
+  <rect x="280" y="280" width="240" height="120" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="290" y="290" width="40" height="40" fill="#78716c" rx="8"/>
+  <text x="310" y="315" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">♻️</text>
+  <text x="340" y="305" font-family="Arial, sans-serif" font-size="16" fill="#1f2937" font-weight="bold">Compost Area</text>
+  <text x="340" y="320" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Composting and soil prep</text>
+  <text x="290" y="345" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Size: 8x4 feet</text>
+  <text x="290" y="360" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Type: Utility/Processing</text>
+  <text x="290" y="375" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Active Plantings: 0</text>
+  <rect x="460" y="340" width="50" height="20" fill="#f3f4f6" stroke="#e5e7eb" rx="4"/>
+  <text x="485" y="352" font-family="Arial, sans-serif" font-size="9" fill="#374151" text-anchor="middle">Edit</text>
+  <rect x="460" y="365" width="50" height="20" fill="#fee2e2" stroke="#fecaca" rx="4"/>
+  <text x="485" y="377" font-family="Arial, sans-serif" font-size="9" fill="#dc2626" text-anchor="middle">Delete</text>
+  
+  <!-- Add Location Card -->
+  <rect x="540" y="280" width="240" height="120" fill="#f8fafc" stroke="#8b5cf6" stroke-dasharray="5,5" rx="8"/>
+  <text x="660" y="340" font-family="Arial, sans-serif" font-size="16" fill="#8b5cf6" text-anchor="middle" font-weight="bold">+ Add New Location</text>
+  <text x="660" y="360" font-family="Arial, sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">Create a new growing area</text>
+  
+  <!-- Statistics -->
+  <rect x="20" y="420" width="760" height="60" fill="#f9fafb" stroke="#e5e7eb" rx="8"/>
+  <text x="30" y="440" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Garden Statistics</text>
+  <text x="30" y="460" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Total Locations: 5 • Active Plantings: 50 • Total Growing Area: 452 sq ft</text>
+  
+  <!-- Location Usage Chart -->
+  <rect x="200" y="440" width="100" height="15" fill="#e5e7eb" rx="7"/>
+  <rect x="200" y="440" width="60" height="15" fill="#10b981" rx="7"/>
+  <text x="310" y="450" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">60% capacity</text>
+  
+  <rect x="400" y="440" width="100" height="15" fill="#e5e7eb" rx="7"/>
+  <rect x="400" y="440" width="80" height="15" fill="#3b82f6" rx="7"/>
+  <text x="510" y="450" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">80% capacity</text>
+  
+  <rect x="600" y="440" width="100" height="15" fill="#e5e7eb" rx="7"/>
+  <rect x="600" y="440" width="40" height="15" fill="#8b5cf6" rx="7"/>
+  <text x="710" y="450" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">40% capacity</text>
+</svg>

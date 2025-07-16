@@ -1,0 +1,79 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="60" fill="#1f2937"/>
+  <text x="20" y="35" font-family="Arial, sans-serif" font-size="18" fill="white" font-weight="bold">GardenIO Dashboard</text>
+  <text x="700" y="35" font-family="Arial, sans-serif" font-size="14" fill="white">My Garden</text>
+  
+  <!-- Stats Cards -->
+  <rect x="20" y="80" width="180" height="100" fill="#3b82f6" rx="8"/>
+  <text x="110" y="115" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" font-weight="bold">8</text>
+  <text x="110" y="135" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">Active Plantings</text>
+  
+  <rect x="220" y="80" width="180" height="100" fill="#10b981" rx="8"/>
+  <text x="310" y="115" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" font-weight="bold">8</text>
+  <text x="310" y="135" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">Ready to Harvest</text>
+  
+  <rect x="420" y="80" width="180" height="100" fill="#f59e0b" rx="8"/>
+  <text x="510" y="115" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" font-weight="bold">2</text>
+  <text x="510" y="135" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">Sprouting Soon</text>
+  
+  <rect x="620" y="80" width="160" height="100" fill="#8b5cf6" rx="8"/>
+  <text x="700" y="115" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" font-weight="bold">6</text>
+  <text x="700" y="135" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">Plant Varieties</text>
+  
+  <!-- Planting Cards -->
+  <text x="20" y="220" font-family="Arial, sans-serif" font-size="18" fill="#1f2937" font-weight="bold">Recent Plantings</text>
+  
+  <!-- Planting Card 1 -->
+  <rect x="20" y="240" width="180" height="120" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="30" y="250" width="40" height="40" fill="#10b981" rx="4"/>
+  <text x="80" y="265" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Tomato - Cherry</text>
+  <text x="80" y="280" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Planted 2 weeks ago</text>
+  <text x="30" y="305" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Location: Greenhouse</text>
+  <text x="30" y="320" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Quantity: 10 plants</text>
+  <rect x="30" y="330" width="60" height="20" fill="#10b981" rx="4"/>
+  <text x="60" y="342" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Ready</text>
+  
+  <!-- Planting Card 2 -->
+  <rect x="220" y="240" width="180" height="120" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="230" y="250" width="40" height="40" fill="#3b82f6" rx="4"/>
+  <text x="280" y="265" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Basil - Sweet</text>
+  <text x="280" y="280" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Planted 1 week ago</text>
+  <text x="230" y="305" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Location: Herb Garden</text>
+  <text x="230" y="320" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Quantity: 5 plants</text>
+  <rect x="230" y="330" width="60" height="20" fill="#3b82f6" rx="4"/>
+  <text x="260" y="342" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Growing</text>
+  
+  <!-- Planting Card 3 -->
+  <rect x="420" y="240" width="180" height="120" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="430" y="250" width="40" height="40" fill="#f59e0b" rx="4"/>
+  <text x="480" y="265" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Lettuce - Romaine</text>
+  <text x="480" y="280" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Planted 3 days ago</text>
+  <text x="430" y="305" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Location: Vegetable Beds</text>
+  <text x="430" y="320" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Quantity: 20 plants</text>
+  <rect x="430" y="330" width="60" height="20" fill="#f59e0b" rx="4"/>
+  <text x="460" y="342" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Sprouting</text>
+  
+  <!-- Add Planting Button -->
+  <rect x="620" y="240" width="160" height="120" fill="#ddd6fe" stroke="#8b5cf6" stroke-dasharray="5,5" rx="8"/>
+  <text x="700" y="300" font-family="Arial, sans-serif" font-size="16" fill="#8b5cf6" text-anchor="middle" font-weight="bold">+ Add Planting</text>
+  
+  <!-- Timeline Preview -->
+  <text x="20" y="400" font-family="Arial, sans-serif" font-size="18" fill="#1f2937" font-weight="bold">Upcoming Tasks</text>
+  
+  <rect x="20" y="420" width="760" height="60" fill="white" stroke="#e5e7eb" rx="8"/>
+  <circle cx="50" cy="450" r="8" fill="#10b981"/>
+  <text x="70" y="445" font-family="Arial, sans-serif" font-size="12" fill="#1f2937" font-weight="bold">Harvest tomatoes</text>
+  <text x="70" y="460" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Due in 2 days</text>
+  
+  <circle cx="300" cy="450" r="8" fill="#f59e0b"/>
+  <text x="320" y="445" font-family="Arial, sans-serif" font-size="12" fill="#1f2937" font-weight="bold">Check lettuce sprouting</text>
+  <text x="320" y="460" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Due in 4 days</text>
+  
+  <circle cx="550" cy="450" r="8" fill="#3b82f6"/>
+  <text x="570" y="445" font-family="Arial, sans-serif" font-size="12" fill="#1f2937" font-weight="bold">Water herb garden</text>
+  <text x="570" y="460" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Due tomorrow</text>
+</svg>

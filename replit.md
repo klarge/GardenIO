@@ -163,6 +163,9 @@ Changelog:
   * Enhanced documentation with tech stack details and contribution guidelines
   * Created docs/screenshots directory structure for future visual documentation
   * Added sample data to demonstrate application features effectively
+  * Replaced placeholder screenshot links with actual SVG mockups embedded in README
+  * Created visual representations of dashboard, plant library, locations, and mobile app
+  * Fixed screenshot rendering issue - images are now displayed inline instead of broken links
 ```
 
 ## User Preferences
