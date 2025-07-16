@@ -1,5 +1,5 @@
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
+import { queryClient, setApiUrlProvider } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +8,9 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { GardenProvider } from "@/hooks/use-garden";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ThemeProvider } from "@/lib/theme-provider";
+import { ServerConfigProvider, useServerConfig } from "@/hooks/use-server-config";
+import { ServerConfig } from "@/components/server-config";
+import { useEffect } from "react";
 import Dashboard from "@/pages/dashboard";
 import PlantLibrary from "@/pages/plant-library";
 import Timeline from "@/pages/timeline";
@@ -28,7 +31,13 @@ function Router() {
   );
 }
 
-function App() {
+function AppContent() {
+  const { getApiUrl, isNativeApp, isConfigured } = useServerConfig();
+
+  useEffect(() => {
+    setApiUrlProvider(getApiUrl);
+  }, [getApiUrl]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
@@ -40,6 +49,15 @@ function App() {
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                   <Router />
                 </main>
+                {isNativeApp && (
+                  <ServerConfig 
+                    initialOpen={!isConfigured}
+                    onServerConfigured={() => {
+                      // Refresh the page to reload with new server config
+                      window.location.reload();
+                    }}
+                  />
+                )}
               </div>
               <Toaster />
             </TooltipProvider>
@@ -47,6 +65,14 @@ function App() {
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
+  );
+}
+
+function App() {
+  return (
+    <ServerConfigProvider>
+      <AppContent />
+    </ServerConfigProvider>
   );
 }
 

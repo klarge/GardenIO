@@ -144,6 +144,13 @@ Changelog:
   * Updated all API endpoints to work with garden-specific data scoping
   * Fixed planting update functionality with proper PATCH endpoint support
   * Enhanced database schema with gardens and garden_collaborators tables
+- July 16, 2025. Android app server configuration:
+  * Added server configuration system for Android app to connect to custom server instances
+  * Implemented server URL input with connection testing and validation
+  * Created server configuration provider for seamless API URL management
+  * Added Capacitor preferences integration for persistent server URL storage
+  * Enhanced API client to work with both web and native app environments
+  * Fixed Android build compatibility by updating to Java 21 for Gradle support
 ```
 
 ## User Preferences

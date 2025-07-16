@@ -47,7 +47,7 @@ jobs:
       run: npm install -g @capacitor/cli
 
     - name: Install Capacitor packages
-      run: npm install @capacitor/core @capacitor/android
+      run: npm install @capacitor/core @capacitor/android @capacitor/preferences
 
     - name: Initialize Capacitor project
       run: |
@@ -65,6 +65,11 @@ jobs:
           bundledWebRuntime: false,
           server: {
             androidScheme: 'https'
+          },
+          plugins: {
+            CapacitorCookies: {
+              enabled: true
+            }
           }
         };
         

@@ -1,5 +1,12 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// Global variable to store the server config function
+let getApiUrl: ((path: string) => string) | null = null;
+
+export function setApiUrlProvider(provider: (path: string) => string) {
+  getApiUrl = provider;
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -12,9 +19,10 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  const fullUrl = getApiUrl ? getApiUrl(url) : url;
   const isFormData = data instanceof FormData;
   
-  const res = await fetch(url, {
+  const res = await fetch(fullUrl, {
     method,
     headers: data && !isFormData ? { "Content-Type": "application/json" } : {},
     body: data ? (isFormData ? data : JSON.stringify(data)) : undefined,
@@ -31,7 +39,10 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    const url = queryKey[0] as string;
+    const fullUrl = getApiUrl ? getApiUrl(url) : url;
+    
+    const res = await fetch(fullUrl, {
       credentials: "include",
     });
 
