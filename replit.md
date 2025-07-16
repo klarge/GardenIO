@@ -151,6 +151,11 @@ Changelog:
   * Added Capacitor preferences integration for persistent server URL storage
   * Enhanced API client to work with both web and native app environments
   * Fixed Android build compatibility by updating to Java 21 for Gradle support
+- July 16, 2025. Docker deployment improvements:
+  * Updated Docker Compose to use pre-built images from GitHub Container Registry
+  * Created separate docker-compose.dev.yml for local development builds
+  * Simplified deployment process - users can now spin up instances with just docker-compose up
+  * Added comprehensive README documentation for all deployment options
 ```
 
 ## User Preferences

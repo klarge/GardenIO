@@ -25,7 +25,7 @@ A comprehensive gardening web application with user authentication, plant librar
 
 ### Using Docker (Recommended)
 
-#### Option 1: Docker Compose (Multi-container)
+#### Option 1: Docker Compose (Recommended)
 1. Clone the repository:
 ```bash
 git clone https://github.com/klarge/GardenIO.git
@@ -36,10 +36,18 @@ cd GardenIO
 ```bash
 docker-compose up -d
 ```
+*Note: This will first try to pull the pre-built image. If not available, it will build from source automatically.*
 
 3. Access the application at `http://localhost:5000`
 
-#### Option 2: Standalone Docker Image (Single container)
+#### Option 2: Force Local Build
+If you want to build from source instead of using pre-built images:
+```bash
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+#### Option 3: Standalone Docker Image (Single container)
 1. Build the standalone image:
 ```bash
 docker build -f Dockerfile.standalone -t gardenio-standalone .
