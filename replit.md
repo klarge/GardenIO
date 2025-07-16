@@ -131,10 +131,19 @@ Changelog:
   * Created health check endpoints for production monitoring
   * Added comprehensive README with deployment instructions
   * Fixed GitHub Actions workflows for reliable Docker and Android builds
-  * Configured Java 17 compatibility for stable Android compilation
+  * Updated Java version to 21 for Android Gradle Plugin compatibility
   * Created standalone Docker image with embedded PostgreSQL database
   * Added automatic database initialization and schema migration
   * Fixed image upload functionality for plant photos
+- July 15, 2025. Multi-garden system and collaboration features:
+  * Implemented multiple gardens system - users can create and manage separate gardens
+  * Added garden collaborator system with role-based access control
+  * Created harvest tracking with detailed recording of dates, quantities, and notes
+  * Built garden selector component with dropdown for easy garden switching
+  * Added garden settings UI for managing collaborators per garden
+  * Updated all API endpoints to work with garden-specific data scoping
+  * Fixed planting update functionality with proper PATCH endpoint support
+  * Enhanced database schema with gardens and garden_collaborators tables
 ```
 
 ## User Preferences
