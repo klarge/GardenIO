@@ -156,6 +156,15 @@ Changelog:
   * Created separate docker-compose.dev.yml for local development builds
   * Simplified deployment process - users can now spin up instances with just docker-compose up
   * Added comprehensive README documentation for all deployment options
+- May 02, 2026. Vendor tracking system added:
+  * New Vendors page for managing seed and plant suppliers
+  * Vendor fields: name, website, plant category, shipping/pickup options, notes
+  * Full CRUD for vendors with color-coded category badges
+  * Plant-to-vendor association: plants can be linked to one or more vendors
+  * Vendor selection added to the plant form (checkbox multi-select)
+  * Plant library cards now show associated vendor badges
+  * New database tables: vendors and plant_vendors (join table)
+  * New API endpoints: /api/vendors (CRUD) and /api/plants/:id/vendors (association)
 - July 16, 2025. README enhancement and documentation:
   * Added comprehensive feature showcase with detailed descriptions
   * Created visual README with screenshot placeholders for key features
