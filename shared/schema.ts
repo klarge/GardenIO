@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, date, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, date, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
@@ -19,6 +19,22 @@ export const plants = pgTable("plants", {
   daysToHarvest: integer("days_to_harvest").notNull(),
   season: text("season").notNull(),
   imageUrl: text("image_url"),
+});
+
+export const vendors = pgTable("vendors", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  website: text("website"),
+  category: text("category").notNull(), // seeds, vegetables, herbs, fruits, general
+  offersShipping: boolean("offers_shipping").notNull().default(false),
+  offersPickup: boolean("offers_pickup").notNull().default(false),
+  notes: text("notes"),
+});
+
+export const plantVendors = pgTable("plant_vendors", {
+  id: serial("id").primaryKey(),
+  plantId: integer("plant_id").notNull(),
+  vendorId: integer("vendor_id").notNull(),
 });
 
 export const gardens = pgTable("gardens", {
@@ -63,6 +79,14 @@ export const insertPlantSchema = createInsertSchema(plants).omit({
   id: true,
 });
 
+export const insertVendorSchema = createInsertSchema(vendors).omit({
+  id: true,
+});
+
+export const insertPlantVendorSchema = createInsertSchema(plantVendors).omit({
+  id: true,
+});
+
 export const insertLocationSchema = createInsertSchema(locations).omit({
   id: true,
 });
@@ -100,6 +124,10 @@ export const harvestPlantingSchema = z.object({
 
 export type InsertPlant = z.infer<typeof insertPlantSchema>;
 export type Plant = typeof plants.$inferSelect;
+export type InsertVendor = z.infer<typeof insertVendorSchema>;
+export type Vendor = typeof vendors.$inferSelect;
+export type InsertPlantVendor = z.infer<typeof insertPlantVendorSchema>;
+export type PlantVendor = typeof plantVendors.$inferSelect;
 export type InsertLocation = z.infer<typeof insertLocationSchema>;
 export type Location = typeof locations.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -162,6 +190,25 @@ export const plantingsRelations = relations(plantings, ({ one }) => ({
   }),
 }));
 
+export const plantsRelations = relations(plants, ({ many }) => ({
+  plantVendors: many(plantVendors),
+}));
+
+export const vendorsRelations = relations(vendors, ({ many }) => ({
+  plantVendors: many(plantVendors),
+}));
+
+export const plantVendorsRelations = relations(plantVendors, ({ one }) => ({
+  plant: one(plants, {
+    fields: [plantVendors.plantId],
+    references: [plants.id],
+  }),
+  vendor: one(vendors, {
+    fields: [plantVendors.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
 // Extended types for plantings with related data
 export interface PlantingWithPlant extends Planting {
   plant: Plant;
@@ -169,4 +216,8 @@ export interface PlantingWithPlant extends Planting {
 
 export interface GardenWithCollaborators extends Garden {
   collaborators: (GardenCollaborator & { user: User })[];
+}
+
+export interface PlantWithVendors extends Plant {
+  vendors: Vendor[];
 }

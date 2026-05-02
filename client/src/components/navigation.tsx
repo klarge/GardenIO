@@ -15,6 +15,7 @@ export function Navigation() {
   const navItems = [
     { href: "/", label: "Dashboard" },
     { href: "/library", label: "Plant Library" },
+    { href: "/vendors", label: "Vendors" },
     { href: "/locations", label: "Locations" },
     { href: "/timeline", label: "Calendar" },
   ];

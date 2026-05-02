@@ -15,6 +15,7 @@ import Dashboard from "@/pages/dashboard";
 import PlantLibrary from "@/pages/plant-library";
 import Timeline from "@/pages/timeline";
 import Locations from "@/pages/locations";
+import Vendors from "@/pages/vendors";
 import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 
@@ -23,6 +24,7 @@ function Router() {
     <Switch>
       <ProtectedRoute path="/" component={Dashboard} />
       <ProtectedRoute path="/library" component={PlantLibrary} />
+      <ProtectedRoute path="/vendors" component={Vendors} />
       <ProtectedRoute path="/timeline" component={Timeline} />
       <ProtectedRoute path="/locations" component={Locations} />
       <Route path="/auth" component={AuthPage} />

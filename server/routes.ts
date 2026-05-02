@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertPlantSchema, insertPlantingSchema, insertLocationSchema, insertGardenSchema, insertGardenCollaboratorSchema, harvestPlantingSchema } from "@shared/schema";
+import { insertPlantSchema, insertPlantingSchema, insertLocationSchema, insertGardenSchema, insertGardenCollaboratorSchema, harvestPlantingSchema, insertVendorSchema } from "@shared/schema";
 import { z } from "zod";
 import { setupAuth } from "./auth";
 
@@ -373,6 +373,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid harvest data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to harvest planting" });
+    }
+  });
+
+  // Vendor routes
+  app.get("/api/vendors", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Authentication required' });
+    try {
+      const allVendors = await storage.getVendors();
+      res.json(allVendors);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vendors" });
+    }
+  });
+
+  app.get("/api/vendors/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Authentication required' });
+    try {
+      const vendor = await storage.getVendor(parseInt(req.params.id));
+      if (!vendor) return res.status(404).json({ message: "Vendor not found" });
+      res.json(vendor);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vendor" });
+    }
+  });
+
+  app.post("/api/vendors", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Authentication required' });
+    try {
+      const data = insertVendorSchema.parse(req.body);
+      const vendor = await storage.createVendor(data);
+      res.status(201).json(vendor);
+    } catch (error) {
+      if (error instanceof z.ZodError) return res.status(400).json({ message: "Invalid vendor data", errors: error.errors });
+      res.status(500).json({ message: "Failed to create vendor" });
+    }
+  });
+
+  app.put("/api/vendors/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Authentication required' });
+    try {
+      const data = insertVendorSchema.partial().parse(req.body);
+      const vendor = await storage.updateVendor(parseInt(req.params.id), data);
+      if (!vendor) return res.status(404).json({ message: "Vendor not found" });
+      res.json(vendor);
+    } catch (error) {
+      if (error instanceof z.ZodError) return res.status(400).json({ message: "Invalid vendor data", errors: error.errors });
+      res.status(500).json({ message: "Failed to update vendor" });
+    }
+  });
+
+  app.delete("/api/vendors/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Authentication required' });
+    try {
+      const deleted = await storage.deleteVendor(parseInt(req.params.id));
+      if (!deleted) return res.status(404).json({ message: "Vendor not found" });
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete vendor" });
+    }
+  });
+
+  // Plant-Vendor association routes
+  app.put("/api/plants/:id/vendors", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Authentication required' });
+    try {
+      const plantId = parseInt(req.params.id);
+      const { vendorIds } = req.body;
+      if (!Array.isArray(vendorIds)) return res.status(400).json({ message: "vendorIds must be an array" });
+      await storage.setVendorsForPlant(plantId, vendorIds);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update plant vendors" });
     }
   });
 

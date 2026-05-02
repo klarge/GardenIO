@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Store } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,61 +13,52 @@ import { PlantForm } from "@/components/plant-form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
-import type { Plant, InsertPlant } from "@shared/schema";
+import type { PlantWithVendors, InsertPlant } from "@shared/schema";
 
 export default function PlantLibrary() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [seasonFilter, setSeasonFilter] = useState("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
+  const [editingPlant, setEditingPlant] = useState<PlantWithVendors | null>(null);
   const { toast } = useToast();
 
-  const { data: plants = [], isLoading } = useQuery<Plant[]>({
+  const { data: plants = [], isLoading } = useQuery<PlantWithVendors[]>({
     queryKey: ["/api/plants"],
   });
 
   const createPlantMutation = useMutation({
-    mutationFn: async (data: InsertPlant) => {
+    mutationFn: async ({ data, vendorIds }: { data: InsertPlant; vendorIds: number[] }) => {
       const response = await apiRequest("POST", "/api/plants", data);
-      return response.json();
+      const plant = await response.json();
+      if (vendorIds.length > 0) {
+        await apiRequest("PUT", `/api/plants/${plant.id}/vendors`, { vendorIds });
+      }
+      return plant;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/plants"] });
       setIsAddDialogOpen(false);
-      toast({
-        title: "Success",
-        description: "Plant added to library successfully",
-      });
+      toast({ title: "Success", description: "Plant added to library successfully" });
     },
     onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to add plant to library",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to add plant to library", variant: "destructive" });
     },
   });
 
   const updatePlantMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertPlant> }) => {
+    mutationFn: async ({ id, data, vendorIds }: { id: number; data: Partial<InsertPlant>; vendorIds: number[] }) => {
       const response = await apiRequest("PUT", `/api/plants/${id}`, data);
+      await apiRequest("PUT", `/api/plants/${id}/vendors`, { vendorIds });
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/plants"] });
       setEditingPlant(null);
-      toast({
-        title: "Success",
-        description: "Plant updated successfully",
-      });
+      toast({ title: "Success", description: "Plant updated successfully" });
     },
     onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update plant",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to update plant", variant: "destructive" });
     },
   });
 
@@ -77,17 +68,10 @@ export default function PlantLibrary() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/plants"] });
-      toast({
-        title: "Success",
-        description: "Plant deleted successfully",
-      });
+      toast({ title: "Success", description: "Plant deleted successfully" });
     },
     onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete plant",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to delete plant", variant: "destructive" });
     },
   });
 
@@ -96,20 +80,15 @@ export default function PlantLibrary() {
                          plant.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "all" || plant.category === categoryFilter;
     const matchesSeason = seasonFilter === "all" || plant.season.toLowerCase().includes(seasonFilter.toLowerCase());
-    
     return matchesSearch && matchesCategory && matchesSeason;
   });
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case "vegetable":
-        return "bg-green-100 text-green-800";
-      case "herb":
-        return "bg-purple-100 text-purple-800";
-      case "fruit":
-        return "bg-orange-100 text-orange-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      case "vegetable": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "herb": return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
+      case "fruit": return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      default: return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
     }
   };
 
@@ -118,8 +97,8 @@ export default function PlantLibrary() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-seed-dark mb-2">Plant Library</h2>
-          <p className="text-soil-gray">Manage your collection of plant varieties and their growing information</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Plant Library</h2>
+          <p className="text-muted-foreground">Manage your collection of plant varieties and their growing information</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
@@ -133,7 +112,7 @@ export default function PlantLibrary() {
               <DialogTitle>Add New Plant</DialogTitle>
             </DialogHeader>
             <PlantForm
-              onSubmit={(data) => createPlantMutation.mutate(data)}
+              onSubmit={(data, vendorIds) => createPlantMutation.mutate({ data, vendorIds })}
               isLoading={createPlantMutation.isPending}
             />
           </DialogContent>
@@ -145,7 +124,7 @@ export default function PlantLibrary() {
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-soil-gray h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Search plants by name or description..."
                 value={searchTerm}
@@ -187,13 +166,11 @@ export default function PlantLibrary() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">
-              <div className="h-48 bg-gray-200"></div>
-              <CardContent className="p-6">
-                <div className="space-y-2">
-                  <div className="h-6 bg-gray-200 rounded"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
+              <div className="h-48 bg-muted"></div>
+              <CardContent className="p-6 space-y-2">
+                <div className="h-6 bg-muted rounded"></div>
+                <div className="h-4 bg-muted rounded w-3/4"></div>
+                <div className="h-4 bg-muted rounded w-1/2"></div>
               </CardContent>
             </Card>
           ))}
@@ -201,7 +178,7 @@ export default function PlantLibrary() {
       ) : filteredPlants.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
-            <p className="text-soil-gray">No plants found matching your criteria</p>
+            <p className="text-muted-foreground">No plants found matching your criteria</p>
           </CardContent>
         </Card>
       ) : (
@@ -215,26 +192,43 @@ export default function PlantLibrary() {
               />
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-seed-dark">{plant.name}</h3>
+                  <h3 className="text-lg font-semibold text-foreground">{plant.name}</h3>
                   <Badge className={getCategoryColor(plant.category)}>
                     {plant.category.charAt(0).toUpperCase() + plant.category.slice(1)}
                   </Badge>
                 </div>
-                <p className="text-soil-gray text-sm mb-4 line-clamp-2">{plant.description}</p>
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{plant.description}</p>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-soil-gray">Days to Sprout:</span>
-                    <span className="font-medium text-seed-dark">{plant.daysToSprout} days</span>
+                    <span className="text-muted-foreground">Days to Sprout:</span>
+                    <span className="font-medium">{plant.daysToSprout} days</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-soil-gray">Days to Harvest:</span>
-                    <span className="font-medium text-seed-dark">{plant.daysToHarvest} days</span>
+                    <span className="text-muted-foreground">Days to Harvest:</span>
+                    <span className="font-medium">{plant.daysToHarvest} days</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-soil-gray">Best Season:</span>
-                    <span className="font-medium text-seed-dark">{plant.season}</span>
+                    <span className="text-muted-foreground">Best Season:</span>
+                    <span className="font-medium">{plant.season}</span>
                   </div>
                 </div>
+
+                {plant.vendors && plant.vendors.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <div className="flex items-center gap-1 mb-1.5">
+                      <Store className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">Available from:</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {plant.vendors.map(v => (
+                        <Badge key={v.id} variant="outline" className="text-xs">
+                          {v.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex gap-2 mt-4">
                   <Link href="/tracker">
                     <Button className="flex-1 bg-garden-green hover:bg-green-600 text-sm">
@@ -242,11 +236,7 @@ export default function PlantLibrary() {
                       Plant This
                     </Button>
                   </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEditingPlant(plant)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setEditingPlant(plant)}>
                     <Edit className="h-3 w-3" />
                   </Button>
                   <AlertDialog>
@@ -289,7 +279,8 @@ export default function PlantLibrary() {
           {editingPlant && (
             <PlantForm
               initialData={editingPlant}
-              onSubmit={(data) => updatePlantMutation.mutate({ id: editingPlant.id, data })}
+              initialVendorIds={editingPlant.vendors?.map(v => v.id) || []}
+              onSubmit={(data, vendorIds) => updatePlantMutation.mutate({ id: editingPlant.id, data, vendorIds })}
               isLoading={updatePlantMutation.isPending}
             />
           )}
