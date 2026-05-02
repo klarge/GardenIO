@@ -131,6 +131,8 @@ export function PlantForm({ onSubmit, initialData, initialVendorIds = [], isLoad
                       <SelectItem value="vegetable">Vegetable</SelectItem>
                       <SelectItem value="herb">Herb</SelectItem>
                       <SelectItem value="fruit">Fruit</SelectItem>
+                      <SelectItem value="flower">Flower</SelectItem>
+                      <SelectItem value="tree">Tree</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

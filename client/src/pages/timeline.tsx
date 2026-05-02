@@ -1,18 +1,36 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Sprout, Apple, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sprout, Apple, Clock, Leaf, TreePine } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, isToday, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, isToday, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, addDays } from "date-fns";
 import { calculateSproutDate, calculateHarvestDate, getPlantingStatus, getRelativeTime } from "@/lib/date-utils";
+import { useGarden } from "@/hooks/use-garden";
+import { apiRequest } from "@/lib/queryClient";
 import type { PlantingWithPlant } from "@shared/schema";
+
+type EventType = "planted" | "emerge" | "sprouting" | "harvest" | "maturity";
+
+interface CalendarEvent {
+  date: Date;
+  type: EventType;
+  planting: PlantingWithPlant;
+  title: string;
+  description?: string;
+}
 
 export default function Timeline() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const { currentGarden } = useGarden();
 
   const { data: plantings = [], isLoading } = useQuery<PlantingWithPlant[]>({
-    queryKey: ["/api/plantings"],
+    queryKey: ["/api/plantings", currentGarden?.id],
+    enabled: !!currentGarden,
+    queryFn: async () => {
+      const response = await apiRequest("GET", `/api/plantings?gardenId=${currentGarden!.id}`);
+      return response.json();
+    },
   });
 
   const monthStart = startOfMonth(currentMonth);
@@ -21,203 +39,159 @@ export default function Timeline() {
   const calendarEnd = endOfWeek(monthEnd);
   const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-  // Get events for the current month
-  const monthEvents = plantings.flatMap(planting => {
+  const buildEvents = (planting: PlantingWithPlant): CalendarEvent[] => {
     const plantedDate = new Date(planting.plantedDate);
-    const sproutDate = calculateSproutDate(plantedDate, planting.plant.daysToSprout);
-    const harvestDate = calculateHarvestDate(plantedDate, planting.plant.daysToHarvest);
-    
-    const events = [];
-    
-    // Add planting event
-    if (plantedDate >= monthStart && plantedDate <= monthEnd) {
-      events.push({
-        date: plantedDate,
-        type: "planted",
-        planting,
-        title: `${planting.plant.name} planted`,
-      });
-    }
-    
-    // Add sprout event
-    if (sproutDate >= monthStart && sproutDate <= monthEnd) {
-      events.push({
-        date: sproutDate,
-        type: "sprouting",
-        planting,
-        title: `${planting.plant.name} sprouting`,
-      });
-    }
-    
-    // Add harvest event
-    if (harvestDate >= monthStart && harvestDate <= monthEnd) {
-      events.push({
-        date: harvestDate,
-        type: "harvest",
-        planting,
-        title: `${planting.plant.name} ready to harvest`,
-      });
-    }
-    
-    return events;
-  });
+    const { plant } = planting;
+    const events: CalendarEvent[] = [];
 
-  // Get upcoming events (next 30 days)
+    const candidates: { days: number | null | undefined; type: EventType; label: string }[] = [
+      { days: 0,                    type: "planted",   label: `${plant.name} planted` },
+      { days: plant.daysToEmerge,   type: "emerge",    label: `${plant.name} expected to emerge` },
+      { days: plant.daysToSprout,   type: "sprouting", label: `${plant.name} sprouting` },
+      { days: plant.daysToHarvest,  type: "harvest",   label: `${plant.name} ready to harvest` },
+      { days: plant.daysToMaturity, type: "maturity",  label: `${plant.name} reaching maturity` },
+    ];
+
+    for (const { days, type, label } of candidates) {
+      if (days == null) continue;
+      const date = addDays(plantedDate, days);
+      events.push({ date, type, planting, title: label });
+    }
+
+    return events;
+  };
+
+  // All events across all plantings
+  const allEvents = plantings.flatMap(buildEvents);
+
+  // Events visible in the current month's calendar
+  const monthEvents = allEvents.filter(e => e.date >= monthStart && e.date <= monthEnd);
+
+  // Upcoming events (next 30 days)
   const now = new Date();
-  const upcoming = plantings.flatMap(planting => {
-    const plantedDate = new Date(planting.plantedDate);
-    const sproutDate = calculateSproutDate(plantedDate, planting.plant.daysToSprout);
-    const harvestDate = calculateHarvestDate(plantedDate, planting.plant.daysToHarvest);
-    const status = getPlantingStatus(plantedDate, planting.plant.daysToSprout, planting.plant.daysToHarvest);
-    
-    const events = [];
-    
-    // Add upcoming sprout events
-    if (sproutDate > now && sproutDate <= addMonths(now, 1) && status === "sprouting") {
-      events.push({
-        date: sproutDate,
-        type: "sprouting",
-        planting,
-        title: `${planting.plant.name} Expected to Sprout`,
-        description: `${planting.location} • Expected: ${format(sproutDate, "MMM d, yyyy")} (${getRelativeTime(sproutDate)})`,
-      });
-    }
-    
-    // Add upcoming harvest events
-    if (harvestDate > now && harvestDate <= addMonths(now, 1)) {
-      events.push({
-        date: harvestDate,
-        type: "harvest",
-        planting,
-        title: `${planting.plant.name} Ready to Harvest`,
-        description: `${planting.location} • Expected: ${format(harvestDate, "MMM d, yyyy")} (${getRelativeTime(harvestDate)})`,
-      });
-    }
-    
-    return events;
-  }).sort((a, b) => a.date.getTime() - b.date.getTime());
+  const upcoming = allEvents
+    .filter(e => e.date > now && e.date <= addMonths(now, 1))
+    .map(e => ({
+      ...e,
+      description: `${e.planting.location} • Expected: ${format(e.date, "MMM d, yyyy")} (${getRelativeTime(e.date)})`,
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-  const getEventColor = (type: string) => {
+  const getEventColor = (type: EventType) => {
     switch (type) {
-      case "planted":
-        return "bg-green-600 dark:bg-green-500 text-white";
-      case "sprouting":
-        return "bg-yellow-500 dark:bg-yellow-400 text-white dark:text-black";
-      case "harvest":
-        return "bg-orange-500 dark:bg-orange-400 text-white dark:text-black";
-      default:
-        return "bg-gray-500 dark:bg-gray-400 text-white dark:text-black";
+      case "planted":  return "bg-green-700 dark:bg-green-600 text-white";
+      case "emerge":   return "bg-lime-500 dark:bg-lime-400 text-white dark:text-black";
+      case "sprouting":return "bg-yellow-500 dark:bg-yellow-400 text-white dark:text-black";
+      case "harvest":  return "bg-orange-500 dark:bg-orange-400 text-white dark:text-black";
+      case "maturity": return "bg-red-500 dark:bg-red-400 text-white";
+      default:         return "bg-gray-500 text-white";
     }
   };
 
-  const getEventIcon = (type: string) => {
+  const getEventIcon = (type: EventType) => {
     switch (type) {
-      case "planted":
-        return <Sprout className="h-4 w-4" />;
-      case "sprouting":
-        return <Clock className="h-4 w-4" />;
-      case "harvest":
-        return <Apple className="h-4 w-4" />;
-      default:
-        return <Sprout className="h-4 w-4" />;
+      case "planted":   return <Sprout className="h-3.5 w-3.5 shrink-0" />;
+      case "emerge":    return <Leaf className="h-3.5 w-3.5 shrink-0" />;
+      case "sprouting": return <Clock className="h-3.5 w-3.5 shrink-0" />;
+      case "harvest":   return <Apple className="h-3.5 w-3.5 shrink-0" />;
+      case "maturity":  return <TreePine className="h-3.5 w-3.5 shrink-0" />;
+      default:          return <Sprout className="h-3.5 w-3.5 shrink-0" />;
     }
   };
 
-  const getEventsForDay = (date: Date) => {
-    return monthEvents.filter(event => 
-      format(event.date, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
-    );
+  const getEventLabel = (type: EventType) => {
+    switch (type) {
+      case "planted":   return "Planted";
+      case "emerge":    return "Emerge";
+      case "sprouting": return "Sprouting";
+      case "harvest":   return "Harvest";
+      case "maturity":  return "Maturity";
+      default:          return type;
+    }
   };
+
+  const getEventsForDay = (date: Date) =>
+    monthEvents.filter(e => format(e.date, "yyyy-MM-dd") === format(date, "yyyy-MM-dd"));
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Garden Timeline</h2>
-        <p className="text-muted-foreground">Track your garden's progress and upcoming activities</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Garden Calendar</h2>
+        <p className="text-muted-foreground">Track planting milestones and upcoming garden activities</p>
       </div>
 
-      {/* Timeline Controls */}
+      {/* Legend */}
+      <div className="flex flex-wrap gap-3">
+        {(["planted", "emerge", "sprouting", "harvest", "maturity"] as EventType[]).map(type => (
+          <span key={type} className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${getEventColor(type)}`}>
+            {getEventIcon(type)}
+            {getEventLabel(type)}
+          </span>
+        ))}
+      </div>
+
+      {/* Month Navigation */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4 mb-4 sm:mb-0">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {format(currentMonth, "MMMM yyyy")}
-                </h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="default" className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600">
-                Month
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+                <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button variant="outline">Week</Button>
-              <Button variant="outline">List</Button>
+              <h3 className="text-lg font-semibold text-foreground min-w-[160px] text-center">
+                {format(currentMonth, "MMMM yyyy")}
+              </h3>
+              <Button variant="outline" size="sm" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
+            <Button variant="outline" size="sm" onClick={() => setCurrentMonth(new Date())}>
+              Today
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Calendar */}
+      {/* Calendar Grid */}
       <Card>
         <CardContent className="p-6">
           {isLoading ? (
-            <div className="animate-pulse">
-              <div className="h-96 bg-muted rounded"></div>
-            </div>
+            <div className="animate-pulse h-96 bg-muted rounded" />
           ) : (
             <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
-              {/* Calendar Header */}
+              {/* Day headers */}
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                <div key={day} className="bg-muted p-4 text-center text-sm font-medium text-muted-foreground">
+                <div key={day} className="bg-muted p-3 text-center text-sm font-medium text-muted-foreground">
                   {day}
                 </div>
               ))}
-              
-              {/* Calendar Days */}
+
+              {/* Day cells */}
               {calendarDays.map((date) => {
                 const dayEvents = getEventsForDay(date);
-                const dayNumber = getDate(date);
                 const isCurrentMonth = isSameMonth(date, currentMonth);
-                
                 return (
-                  <div key={date.toISOString()} className={`bg-card p-3 min-h-[120px] ${
-                    !isCurrentMonth ? "opacity-40" : ""
-                  }`}>
-                    <div className={`text-sm font-medium mb-2 ${
-                      isToday(date) 
-                        ? "text-green-600 dark:text-green-400 font-bold" 
-                        : isCurrentMonth 
-                          ? "text-foreground" 
-                          : "text-muted-foreground"
+                  <div
+                    key={date.toISOString()}
+                    className={`bg-card p-2 min-h-[110px] ${!isCurrentMonth ? "opacity-40" : ""}`}
+                  >
+                    <div className={`text-sm font-medium mb-1.5 ${
+                      isToday(date)
+                        ? "text-green-600 dark:text-green-400 font-bold"
+                        : isCurrentMonth ? "text-foreground" : "text-muted-foreground"
                     }`}>
-                      {dayNumber}
+                      {getDate(date)}
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       {dayEvents.map((event, index) => (
                         <div
                           key={index}
-                          className={`text-xs px-2 py-1 rounded ${getEventColor(event.type)}`}
+                          className={`text-xs px-1.5 py-0.5 rounded flex items-center gap-1 ${getEventColor(event.type)}`}
+                          title={event.title}
                         >
-                          <div className="flex items-center gap-1">
-                            {getEventIcon(event.type)}
-                            <span className="truncate">{event.title}</span>
-                          </div>
+                          {getEventIcon(event.type)}
+                          <span className="truncate">{event.planting.plant.name}</span>
                         </div>
                       ))}
                     </div>
@@ -232,30 +206,26 @@ export default function Timeline() {
       {/* Upcoming Events */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-foreground">Upcoming Events</CardTitle>
+          <CardTitle className="text-lg font-semibold text-foreground">Upcoming Events (Next 30 Days)</CardTitle>
         </CardHeader>
         <CardContent>
           {upcoming.length === 0 ? (
             <p className="text-muted-foreground text-center py-8">No upcoming events in the next 30 days</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {upcoming.map((event, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      event.type === "harvest" 
-                        ? "bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300" 
-                        : "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300"
-                    }`}>
+                <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-lg gap-4">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${getEventColor(event.type)}`}>
                       {getEventIcon(event.type)}
                     </div>
-                    <div>
-                      <h4 className="font-medium text-foreground">{event.title}</h4>
-                      <p className="text-sm text-muted-foreground">{event.description}</p>
+                    <div className="min-w-0">
+                      <h4 className="font-medium text-foreground truncate">{event.title}</h4>
+                      <p className="text-sm text-muted-foreground truncate">{event.description}</p>
                     </div>
                   </div>
-                  <Badge className={getEventColor(event.type)}>
-                    {event.type === "harvest" ? "Harvest" : "Sprouting"}
+                  <Badge className={`${getEventColor(event.type)} shrink-0`}>
+                    {getEventLabel(event.type)}
                   </Badge>
                 </div>
               ))}
