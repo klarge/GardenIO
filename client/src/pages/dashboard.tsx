@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Sprout, Apple, Clock, Edit, Trash2, MapPin, Calendar, Plus, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { getPlantingStatus, getStatusColor, formatDate, calculateSproutDate, calculateHarvestDate } from "@/lib/date-utils";
+import { getPlantingStatus, getStatusColor, formatDate, calculateSproutDate, calculateMaturityDate } from "@/lib/date-utils";
 import { PlantingForm } from "@/components/planting-form";
 import { HarvestDialog } from "@/components/harvest-dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -133,13 +133,13 @@ export default function Dashboard() {
         return plantings.filter(p => {
           const plantedDate = new Date(p.plantedDate);
           const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
-          return daysSincePlanted >= p.plant.daysToHarvest && p.status !== "harvested";
+          return daysSincePlanted >= p.plant.daysToMaturity && p.status !== "harvested";
         });
       case "sprouting":
         return plantings.filter(p => {
           const plantedDate = new Date(p.plantedDate);
           const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
-          return daysSincePlanted >= p.plant.daysToSprout && daysSincePlanted < p.plant.daysToHarvest && p.status !== "harvested";
+          return daysSincePlanted >= p.plant.daysToSprout && daysSincePlanted < p.plant.daysToMaturity && p.status !== "harvested";
         });
       default:
         return plantings;
@@ -273,7 +273,7 @@ export default function Dashboard() {
               const status = getPlantingStatus(
                 new Date(planting.plantedDate),
                 planting.plant.daysToSprout,
-                planting.plant.daysToHarvest
+                planting.plant.daysToMaturity
               );
               const statusColor = getStatusColor(status);
 
@@ -462,12 +462,12 @@ export default function Dashboard() {
                   <Badge variant={getStatusColor(getPlantingStatus(
                     new Date(viewingPlanting.plantedDate),
                     viewingPlanting.plant.daysToSprout,
-                    viewingPlanting.plant.daysToHarvest
+                    viewingPlanting.plant.daysToMaturity
                   )) as any}>
                     {getPlantingStatus(
                       new Date(viewingPlanting.plantedDate),
                       viewingPlanting.plant.daysToSprout,
-                      viewingPlanting.plant.daysToHarvest
+                      viewingPlanting.plant.daysToMaturity
                     )}
                   </Badge>
                 </div>
@@ -488,9 +488,9 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-sm font-medium">Expected Harvest</div>
+                    <div className="text-sm font-medium">Expected Maturity</div>
                     <div className="text-sm text-muted-foreground">
-                      {formatDate(calculateHarvestDate(new Date(viewingPlanting.plantedDate), viewingPlanting.plant.daysToHarvest))}
+                      {formatDate(calculateMaturityDate(new Date(viewingPlanting.plantedDate), viewingPlanting.plant.daysToMaturity))}
                     </div>
                   </div>
                 </div>
@@ -498,7 +498,7 @@ export default function Dashboard() {
                 <div className="space-y-1">
                   <div className="text-sm font-medium">Growing Timeline</div>
                   <div className="text-xs text-muted-foreground">
-                    Sprouts in {viewingPlanting.plant.daysToSprout} days • Ready to harvest in {viewingPlanting.plant.daysToHarvest} days
+                    Sprouts in {viewingPlanting.plant.daysToSprout} days • Matures in {viewingPlanting.plant.daysToMaturity} days
                   </div>
                 </div>
 

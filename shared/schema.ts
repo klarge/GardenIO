@@ -17,7 +17,7 @@ export const plants = pgTable("plants", {
   description: text("description").notNull(),
   category: text("category").notNull(), // vegetable, herb, fruit, flower, tree
   daysToSprout: integer("days_to_sprout").notNull(),
-  daysToHarvest: integer("days_to_harvest").notNull(),
+  daysToMaturity: integer("days_to_maturity").notNull(),
   season: text("season").notNull(),
   imageUrl: text("image_url"),
   // Plant traits
@@ -28,8 +28,6 @@ export const plants = pgTable("plants", {
   sowStartInside: boolean("sow_start_inside").default(false),
   sowDirectly: boolean("sow_directly").default(false),
   sowInstructions: text("sow_instructions"),
-  daysToEmerge: integer("days_to_emerge"),
-  daysToMaturity: integer("days_to_maturity"),
   seedDepth: text("seed_depth"),
   spacing: text("spacing"),
   supportsNeeded: boolean("supports_needed").default(false),

@@ -40,7 +40,7 @@ export function PlantForm({ onSubmit, initialData, initialVendorIds = [], isLoad
       description: initialData?.description || "",
       category: initialData?.category || "vegetable",
       daysToSprout: initialData?.daysToSprout || 7,
-      daysToHarvest: initialData?.daysToHarvest || 60,
+      daysToMaturity: initialData?.daysToMaturity || 60,
       season: initialData?.season || "Spring",
       imageUrl: initialData?.imageUrl || "",
       perennial: initialData?.perennial ?? false,
@@ -49,8 +49,6 @@ export function PlantForm({ onSubmit, initialData, initialVendorIds = [], isLoad
       sowStartInside: initialData?.sowStartInside ?? false,
       sowDirectly: initialData?.sowDirectly ?? false,
       sowInstructions: initialData?.sowInstructions || "",
-      daysToEmerge: initialData?.daysToEmerge ?? undefined,
-      daysToMaturity: initialData?.daysToMaturity ?? undefined,
       seedDepth: initialData?.seedDepth || "",
       spacing: initialData?.spacing || "",
       supportsNeeded: initialData?.supportsNeeded ?? false,
@@ -300,42 +298,12 @@ export function PlantForm({ onSubmit, initialData, initialVendorIds = [], isLoad
             />
             <FormField
               control={form.control}
-              name="daysToEmerge"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Days to Emerge</FormLabel>
-                  <FormControl>
-                    <Input type="number" min="1" placeholder="—" {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="daysToHarvest"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Days to Harvest *</FormLabel>
-                  <FormControl>
-                    <Input type="number" min="1" max="365" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="daysToMaturity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Days to Maturity</FormLabel>
+                  <FormLabel>Days to Maturity *</FormLabel>
                   <FormControl>
-                    <Input type="number" min="1" placeholder="—" {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)} />
+                    <Input type="number" min="1" max="3650" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Sprout, Apple, Clock, Leaf, TreePine } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sprout, Clock, TreePine } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, isToday, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, addDays } from "date-fns";
-import { calculateSproutDate, calculateHarvestDate, getPlantingStatus, getRelativeTime } from "@/lib/date-utils";
+import { getRelativeTime } from "@/lib/date-utils";
 import { useGarden } from "@/hooks/use-garden";
 import { apiRequest } from "@/lib/queryClient";
 import type { PlantingWithPlant } from "@shared/schema";
 
-type EventType = "planted" | "emerge" | "sprouting" | "harvest" | "maturity";
+type EventType = "planted" | "sprouting" | "maturity";
 
 interface CalendarEvent {
   date: Date;
@@ -46,9 +46,7 @@ export default function Timeline() {
 
     const candidates: { days: number | null | undefined; type: EventType; label: string }[] = [
       { days: 0,                    type: "planted",   label: `${plant.name} planted` },
-      { days: plant.daysToEmerge,   type: "emerge",    label: `${plant.name} expected to emerge` },
       { days: plant.daysToSprout,   type: "sprouting", label: `${plant.name} sprouting` },
-      { days: plant.daysToHarvest,  type: "harvest",   label: `${plant.name} ready to harvest` },
       { days: plant.daysToMaturity, type: "maturity",  label: `${plant.name} reaching maturity` },
     ];
 
@@ -79,21 +77,17 @@ export default function Timeline() {
 
   const getEventColor = (type: EventType) => {
     switch (type) {
-      case "planted":  return "bg-green-700 dark:bg-green-600 text-white";
-      case "emerge":   return "bg-lime-500 dark:bg-lime-400 text-white dark:text-black";
-      case "sprouting":return "bg-yellow-500 dark:bg-yellow-400 text-white dark:text-black";
-      case "harvest":  return "bg-orange-500 dark:bg-orange-400 text-white dark:text-black";
-      case "maturity": return "bg-red-500 dark:bg-red-400 text-white";
-      default:         return "bg-gray-500 text-white";
+      case "planted":   return "bg-green-700 dark:bg-green-600 text-white";
+      case "sprouting": return "bg-yellow-500 dark:bg-yellow-400 text-white dark:text-black";
+      case "maturity":  return "bg-red-500 dark:bg-red-400 text-white";
+      default:          return "bg-gray-500 text-white";
     }
   };
 
   const getEventIcon = (type: EventType) => {
     switch (type) {
       case "planted":   return <Sprout className="h-3.5 w-3.5 shrink-0" />;
-      case "emerge":    return <Leaf className="h-3.5 w-3.5 shrink-0" />;
       case "sprouting": return <Clock className="h-3.5 w-3.5 shrink-0" />;
-      case "harvest":   return <Apple className="h-3.5 w-3.5 shrink-0" />;
       case "maturity":  return <TreePine className="h-3.5 w-3.5 shrink-0" />;
       default:          return <Sprout className="h-3.5 w-3.5 shrink-0" />;
     }
@@ -102,9 +96,7 @@ export default function Timeline() {
   const getEventLabel = (type: EventType) => {
     switch (type) {
       case "planted":   return "Planted";
-      case "emerge":    return "Emerge";
       case "sprouting": return "Sprouting";
-      case "harvest":   return "Harvest";
       case "maturity":  return "Maturity";
       default:          return type;
     }
@@ -123,7 +115,7 @@ export default function Timeline() {
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3">
-        {(["planted", "emerge", "sprouting", "harvest", "maturity"] as EventType[]).map(type => (
+        {(["planted", "sprouting", "maturity"] as EventType[]).map(type => (
           <span key={type} className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${getEventColor(type)}`}>
             {getEventIcon(type)}
             {getEventLabel(type)}

@@ -4,8 +4,8 @@ export function calculateSproutDate(plantedDate: Date, daysToSprout: number): Da
   return addDays(plantedDate, daysToSprout);
 }
 
-export function calculateHarvestDate(plantedDate: Date, daysToHarvest: number): Date {
-  return addDays(plantedDate, daysToHarvest);
+export function calculateMaturityDate(plantedDate: Date, daysToMaturity: number): Date {
+  return addDays(plantedDate, daysToMaturity);
 }
 
 export function formatDate(date: Date): string {
@@ -23,11 +23,11 @@ export function getRelativeTime(date: Date): string {
   return `in ${formatDistanceToNow(date)}`;
 }
 
-export function getPlantingStatus(plantedDate: Date, daysToSprout: number, daysToHarvest: number): string {
+export function getPlantingStatus(plantedDate: Date, daysToSprout: number, daysToMaturity: number): string {
   const today = new Date();
   const daysSincePlanted = Math.floor((today.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
-  
-  if (daysSincePlanted >= daysToHarvest) {
+
+  if (daysSincePlanted >= daysToMaturity) {
     return "ready";
   } else if (daysSincePlanted >= daysToSprout) {
     return "growing";

@@ -13,7 +13,7 @@ import { PlantingForm } from "@/components/planting-form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
-import { formatDate, calculateSproutDate, calculateHarvestDate, getPlantingStatus, getStatusColor } from "@/lib/date-utils";
+import { formatDate, calculateSproutDate, calculateMaturityDate, getPlantingStatus, getStatusColor } from "@/lib/date-utils";
 import type { Plant, PlantingWithPlant, InsertPlanting } from "@shared/schema";
 
 export default function PlantingTracker() {
@@ -99,7 +99,7 @@ export default function PlantingTracker() {
   const filteredPlantings = plantings.filter((planting) => {
     const matchesSearch = planting.plant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          planting.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const status = getPlantingStatus(new Date(planting.plantedDate), planting.plant.daysToSprout, planting.plant.daysToHarvest);
+    const status = getPlantingStatus(new Date(planting.plantedDate), planting.plant.daysToSprout, planting.plant.daysToMaturity);
     const matchesStatus = statusFilter === "all" || status === statusFilter;
     
     return matchesSearch && matchesStatus;
@@ -168,7 +168,7 @@ export default function PlantingTracker() {
                     <TableHead>Plant & Location</TableHead>
                     <TableHead>Planted Date</TableHead>
                     <TableHead>Expected Sprout</TableHead>
-                    <TableHead>Expected Harvest</TableHead>
+                    <TableHead>Expected Maturity</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -177,8 +177,8 @@ export default function PlantingTracker() {
                   {filteredPlantings.map((planting) => {
                     const plantedDate = new Date(planting.plantedDate);
                     const sproutDate = calculateSproutDate(plantedDate, planting.plant.daysToSprout);
-                    const harvestDate = calculateHarvestDate(plantedDate, planting.plant.daysToHarvest);
-                    const status = getPlantingStatus(plantedDate, planting.plant.daysToSprout, planting.plant.daysToHarvest);
+                    const maturityDate = calculateMaturityDate(plantedDate, planting.plant.daysToMaturity);
+                    const status = getPlantingStatus(plantedDate, planting.plant.daysToSprout, planting.plant.daysToMaturity);
                     
                     return (
                       <TableRow key={planting.id}>
@@ -195,7 +195,7 @@ export default function PlantingTracker() {
                           {formatDate(sproutDate)}
                         </TableCell>
                         <TableCell className="text-sm text-soil-gray">
-                          {formatDate(harvestDate)}
+                          {formatDate(maturityDate)}
                         </TableCell>
                         <TableCell>
                           <Badge className={getStatusColor(status)}>

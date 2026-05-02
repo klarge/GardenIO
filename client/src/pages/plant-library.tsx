@@ -249,10 +249,6 @@ export default function PlantLibrary() {
                     <span className="text-muted-foreground">Days to Sprout:</span>
                     <span className="font-medium">{plant.daysToSprout} days</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Days to Harvest:</span>
-                    <span className="font-medium">{plant.daysToHarvest} days</span>
-                  </div>
                   {plant.daysToMaturity && (
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Days to Maturity:</span>

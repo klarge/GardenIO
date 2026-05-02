@@ -94,7 +94,7 @@ export class DatabaseStorage implements IStorage {
           description: "Small, sweet cherry tomatoes perfect for salads and snacking. Easy to grow and very productive.",
           category: "vegetable",
           daysToSprout: 10,
-          daysToHarvest: 75,
+          daysToMaturity: 75,
           season: "Spring/Summer",
           imageUrl: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop"
         },
@@ -103,7 +103,7 @@ export class DatabaseStorage implements IStorage {
           description: "Crisp, tall heads of romaine lettuce with excellent flavor. Great for salads and wraps.",
           category: "vegetable",
           daysToSprout: 8,
-          daysToHarvest: 60,
+          daysToMaturity: 60,
           season: "Spring/Fall",
           imageUrl: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=300&fit=crop"
         },
@@ -112,7 +112,7 @@ export class DatabaseStorage implements IStorage {
           description: "Classic Italian basil with intense flavor and aroma. Perfect for cooking and making pesto.",
           category: "herb",
           daysToSprout: 7,
-          daysToHarvest: 75,
+          daysToMaturity: 75,
           season: "Summer",
           imageUrl: "https://images.unsplash.com/photo-1607532941433-304659e8198a?w=400&h=300&fit=crop"
         },
@@ -121,7 +121,7 @@ export class DatabaseStorage implements IStorage {
           description: "Quick-growing, mild-flavored radishes perfect for beginners. Ready to harvest in just 30 days.",
           category: "vegetable",
           daysToSprout: 5,
-          daysToHarvest: 30,
+          daysToMaturity: 30,
           season: "Spring/Fall",
           imageUrl: "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?w=400&h=300&fit=crop"
         },
@@ -130,7 +130,7 @@ export class DatabaseStorage implements IStorage {
           description: "Tender baby spinach leaves perfect for salads and cooking. Cold-hardy and fast-growing.",
           category: "vegetable",
           daysToSprout: 6,
-          daysToHarvest: 45,
+          daysToMaturity: 45,
           season: "Spring/Fall",
           imageUrl: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=300&fit=crop"
         },
@@ -139,7 +139,7 @@ export class DatabaseStorage implements IStorage {
           description: "Sweet, crisp carrots with excellent flavor. Great for fresh eating and storage.",
           category: "vegetable",
           daysToSprout: 12,
-          daysToHarvest: 70,
+          daysToMaturity: 70,
           season: "Spring/Fall",
           imageUrl: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=300&fit=crop"
         }
@@ -434,13 +434,13 @@ export class DatabaseStorage implements IStorage {
     const readyHarvest = gardenPlantings.filter(p => {
       const plantedDate = new Date(p.plantedDate);
       const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
-      return daysSincePlanted >= p.plant.daysToHarvest && p.status !== "harvested";
+      return daysSincePlanted >= p.plant.daysToMaturity && p.status !== "harvested";
     }).length;
 
     const sproutingSoon = gardenPlantings.filter(p => {
       const plantedDate = new Date(p.plantedDate);
       const daysSincePlanted = Math.floor((now.getTime() - plantedDate.getTime()) / (1000 * 60 * 60 * 24));
-      return daysSincePlanted >= p.plant.daysToSprout && daysSincePlanted < p.plant.daysToHarvest && p.status !== "harvested";
+      return daysSincePlanted >= p.plant.daysToSprout && daysSincePlanted < p.plant.daysToMaturity && p.status !== "harvested";
     }).length;
 
     const plantVarieties = new Set(gardenPlantings.map(p => p.plant.id)).size;
