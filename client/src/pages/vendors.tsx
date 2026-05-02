@@ -11,7 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -49,7 +48,7 @@ function VendorForm({ onSubmit, initialData, isLoading, onCancel }: {
       name: initialData?.name || "",
       website: initialData?.website || "",
       address: initialData?.address || "",
-      category: initialData?.category || "general",
+      category: initialData?.category || [],
       offersShipping: initialData?.offersShipping ?? false,
       offersPickup: initialData?.offersPickup ?? false,
       notes: initialData?.notes || "",
@@ -77,20 +76,27 @@ function VendorForm({ onSubmit, initialData, isLoading, onCancel }: {
             control={form.control}
             name="category"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Plant Category</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {VENDOR_CATEGORIES.map(c => (
-                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <FormItem className="sm:col-span-2">
+                <FormLabel>Plant Categories</FormLabel>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 pt-1">
+                  {VENDOR_CATEGORIES.map(c => {
+                    const checked = (field.value as string[] || []).includes(c.value);
+                    return (
+                      <label key={c.value} className="flex items-center gap-2 cursor-pointer">
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(val) => {
+                            const current = (field.value as string[] || []);
+                            field.onChange(
+                              val ? [...current, c.value] : current.filter(v => v !== c.value)
+                            );
+                          }}
+                        />
+                        <span className="text-sm font-normal">{c.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -314,9 +320,16 @@ export default function Vendors() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Badge className={getCategoryColor(vendor.category)}>
-                  {VENDOR_CATEGORIES.find(c => c.value === vendor.category)?.label || vendor.category}
-                </Badge>
+                <div className="flex flex-wrap gap-1.5">
+                  {(vendor.category as string[]).length > 0
+                    ? (vendor.category as string[]).map(cat => (
+                        <Badge key={cat} className={getCategoryColor(cat)}>
+                          {VENDOR_CATEGORIES.find(c => c.value === cat)?.label || cat}
+                        </Badge>
+                      ))
+                    : <Badge className={getCategoryColor("general")}>General</Badge>
+                  }
+                </div>
 
                 {vendor.website && (
                   <a

@@ -40,7 +40,7 @@ export const vendors = pgTable("vendors", {
   name: text("name").notNull(),
   website: text("website"),
   address: text("address"),
-  category: text("category").notNull(), // seeds, vegetables, herbs, fruits, general
+  category: text("category").array().notNull().default([]),
   offersShipping: boolean("offers_shipping").notNull().default(false),
   offersPickup: boolean("offers_pickup").notNull().default(false),
   notes: text("notes"),
