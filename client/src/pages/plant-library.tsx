@@ -197,9 +197,14 @@ export default function PlantLibrary() {
                 className="w-full h-48 object-cover"
               />
               <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-foreground">{plant.name}</h3>
-                  <Badge className={getCategoryColor(plant.category)}>
+                <div className="flex items-start justify-between mb-3 gap-2">
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-semibold text-foreground leading-tight">{plant.name}</h3>
+                    {plant.cultivar && (
+                      <p className="text-sm text-muted-foreground">{plant.cultivar}</p>
+                    )}
+                  </div>
+                  <Badge className={`${getCategoryColor(plant.category)} shrink-0`}>
                     {plant.category.charAt(0).toUpperCase() + plant.category.slice(1)}
                   </Badge>
                 </div>
@@ -218,6 +223,18 @@ export default function PlantLibrary() {
                       <Thermometer className="h-3 w-3" />
                       {plant.coldHardiness === "hardy" ? "Hardy" : "Cold Sensitive"}
                     </span>
+                  )}
+                  {plant.perennial && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">Perennial</span>
+                  )}
+                  {plant.heirloom && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">Heirloom</span>
+                  )}
+                  {plant.sowStartInside && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200">Start Inside</span>
+                  )}
+                  {plant.sowDirectly && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-lime-100 text-lime-800 dark:bg-lime-900 dark:text-lime-200">Direct Sow</span>
                   )}
                   {plant.supportsNeeded && (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">Needs Support</span>

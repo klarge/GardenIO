@@ -13,14 +13,20 @@ export const users = pgTable("users", {
 export const plants = pgTable("plants", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  cultivar: text("cultivar"),
   description: text("description").notNull(),
-  category: text("category").notNull(), // vegetable, herb, fruit
+  category: text("category").notNull(), // vegetable, herb, fruit, flower, tree
   daysToSprout: integer("days_to_sprout").notNull(),
   daysToHarvest: integer("days_to_harvest").notNull(),
   season: text("season").notNull(),
   imageUrl: text("image_url"),
+  // Plant traits
+  perennial: boolean("perennial").default(false),
+  heirloom: boolean("heirloom").default(false),
   // Growing conditions
   sunRequirement: text("sun_requirement"), // full_sun, full_sun_partial_shade, shade
+  sowStartInside: boolean("sow_start_inside").default(false),
+  sowDirectly: boolean("sow_directly").default(false),
   sowInstructions: text("sow_instructions"),
   daysToEmerge: integer("days_to_emerge"),
   daysToMaturity: integer("days_to_maturity"),

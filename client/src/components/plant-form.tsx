@@ -36,13 +36,18 @@ export function PlantForm({ onSubmit, initialData, initialVendorIds = [], isLoad
     resolver: zodResolver(insertPlantSchema),
     defaultValues: {
       name: initialData?.name || "",
+      cultivar: initialData?.cultivar || "",
       description: initialData?.description || "",
       category: initialData?.category || "vegetable",
       daysToSprout: initialData?.daysToSprout || 7,
       daysToHarvest: initialData?.daysToHarvest || 60,
       season: initialData?.season || "Spring",
       imageUrl: initialData?.imageUrl || "",
+      perennial: initialData?.perennial ?? false,
+      heirloom: initialData?.heirloom ?? false,
       sunRequirement: initialData?.sunRequirement || "",
+      sowStartInside: initialData?.sowStartInside ?? false,
+      sowDirectly: initialData?.sowDirectly ?? false,
       sowInstructions: initialData?.sowInstructions || "",
       daysToEmerge: initialData?.daysToEmerge ?? undefined,
       daysToMaturity: initialData?.daysToMaturity ?? undefined,
@@ -114,11 +119,25 @@ export function PlantForm({ onSubmit, initialData, initialVendorIds = [], isLoad
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Plant Name *</FormLabel>
-                  <FormControl><Input placeholder="e.g., Tomato - Cherry" {...field} /></FormControl>
+                  <FormControl><Input placeholder="e.g., Tomato" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="cultivar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cultivar / Variety</FormLabel>
+                  <FormControl><Input placeholder="e.g., Cherry, Brandywine" {...field} value={field.value || ""} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="category"
@@ -198,14 +217,34 @@ export function PlantForm({ onSubmit, initialData, initialVendorIds = [], isLoad
             />
           </div>
 
-          <div className="flex gap-6 pt-1">
+          <div className="flex flex-wrap gap-6 pt-1">
+            <FormField
+              control={form.control}
+              name="perennial"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2 space-y-0">
+                  <FormControl><Checkbox checked={!!field.value} onCheckedChange={field.onChange} /></FormControl>
+                  <FormLabel className="cursor-pointer font-normal">Perennial</FormLabel>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="heirloom"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2 space-y-0">
+                  <FormControl><Checkbox checked={!!field.value} onCheckedChange={field.onChange} /></FormControl>
+                  <FormLabel className="cursor-pointer font-normal">Heirloom</FormLabel>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="supportsNeeded"
               render={({ field }) => (
                 <FormItem className="flex items-center gap-2 space-y-0">
                   <FormControl><Checkbox checked={!!field.value} onCheckedChange={field.onChange} /></FormControl>
-                  <FormLabel className="cursor-pointer font-normal">Supports needed (stakes, cages, trellis)</FormLabel>
+                  <FormLabel className="cursor-pointer font-normal">Supports needed</FormLabel>
                 </FormItem>
               )}
             />
@@ -310,6 +349,29 @@ export function PlantForm({ onSubmit, initialData, initialVendorIds = [], isLoad
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
             <Leaf className="h-3.5 w-3.5" /> Sowing Details
           </h3>
+          <div className="flex gap-6">
+            <FormField
+              control={form.control}
+              name="sowStartInside"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2 space-y-0">
+                  <FormControl><Checkbox checked={!!field.value} onCheckedChange={field.onChange} /></FormControl>
+                  <FormLabel className="cursor-pointer font-normal">Start Inside</FormLabel>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="sowDirectly"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2 space-y-0">
+                  <FormControl><Checkbox checked={!!field.value} onCheckedChange={field.onChange} /></FormControl>
+                  <FormLabel className="cursor-pointer font-normal">Sow Directly</FormLabel>
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
             name="sowInstructions"
