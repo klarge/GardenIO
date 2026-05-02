@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Sprout, Clock, TreePine, MapPin, CalendarDays, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sprout, Clock, TreePine, MapPin, CalendarDays } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, isToday, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, addDays } from "date-fns";
-import { getRelativeTime } from "@/lib/date-utils";
+import { getRelativeTime, getPlantingStatus, getStatusColor, calculateSproutDate, calculateMaturityDate, formatDate } from "@/lib/date-utils";
 import { useGarden } from "@/hooks/use-garden";
-import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import type { PlantingWithPlant } from "@shared/schema";
 
@@ -26,7 +25,6 @@ export default function Timeline() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const { currentGarden } = useGarden();
-  const [, navigate] = useLocation();
 
   const { data: plantings = [], isLoading } = useQuery<PlantingWithPlant[]>({
     queryKey: ["/api/plantings", currentGarden?.id],
@@ -231,78 +229,103 @@ export default function Timeline() {
         </CardContent>
       </Card>
 
-      {/* Event Detail Dialog */}
-      {selectedEvent && (
-        <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${getEventColor(selectedEvent.type)}`}>
-                  {getEventIcon(selectedEvent.type)}
-                  {getEventLabel(selectedEvent.type)}
-                </span>
-                <span className="truncate">{selectedEvent.planting.plant.name}</span>
-              </DialogTitle>
-            </DialogHeader>
+      {/* Planting Detail Dialog */}
+      {selectedEvent && (() => {
+        const { planting, type, date } = selectedEvent;
+        const plantedDate = new Date(planting.plantedDate);
+        const status = getPlantingStatus(plantedDate, planting.plant.daysToSprout, planting.plant.daysToMaturity);
+        const statusColor = getStatusColor(status);
+        return (
+          <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="sr-only">{planting.plant.name}</DialogTitle>
+                <DialogDescription className="sr-only">Planting details for {planting.plant.name}</DialogDescription>
+              </DialogHeader>
 
-            <div className="space-y-4">
-              {selectedEvent.planting.plant.cultivar && (
-                <p className="text-sm text-muted-foreground -mt-2">{selectedEvent.planting.plant.cultivar}</p>
-              )}
+              <div className="space-y-5">
+                {/* Plant image + name header */}
+                {planting.plant.imageUrl && (
+                  <img
+                    src={planting.plant.imageUrl}
+                    alt={planting.plant.name}
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                )}
 
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="space-y-0.5">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Event Date</p>
-                  <div className="flex items-center gap-1.5">
-                    <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>{format(selectedEvent.date, "MMM d, yyyy")}</span>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-lg leading-tight">{planting.plant.name}</h3>
+                    {planting.plant.cultivar && (
+                      <p className="text-sm text-muted-foreground">{planting.plant.cultivar}</p>
+                    )}
+                    <div className="flex items-center text-sm text-muted-foreground mt-1">
+                      <MapPin className="h-3.5 w-3.5 mr-1 shrink-0" />
+                      {planting.location}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <Badge variant={statusColor as any} className="capitalize">{status}</Badge>
+                    <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${getEventColor(type)}`}>
+                      {getEventIcon(type)}
+                      {getEventLabel(type)}: {format(date, "MMM d")}
+                    </span>
                   </div>
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Planted</p>
-                  <div className="flex items-center gap-1.5">
-                    <Sprout className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>{format(new Date(selectedEvent.planting.plantedDate), "MMM d, yyyy")}</span>
+
+                {/* Key dates grid */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-muted-foreground">Planted</p>
+                    <div className="flex items-center gap-1">
+                      <Sprout className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span>{formatDate(plantedDate)}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-muted-foreground">Quantity</p>
+                    <span>{planting.quantity} plant{planting.quantity !== 1 ? "s" : ""}</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-muted-foreground">Expected Sprout</p>
+                    <div className="flex items-center gap-1">
+                      <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span>{formatDate(calculateSproutDate(plantedDate, planting.plant.daysToSprout))}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-muted-foreground">Expected Maturity</p>
+                    <div className="flex items-center gap-1">
+                      <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span>{formatDate(calculateMaturityDate(plantedDate, planting.plant.daysToMaturity))}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Location</p>
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>{selectedEvent.planting.location}</span>
+
+                {/* Timeline summary */}
+                <div className="text-xs text-muted-foreground bg-muted rounded px-3 py-2 flex items-center gap-2">
+                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                  Sprouts in {planting.plant.daysToSprout} days • Matures in {planting.plant.daysToMaturity} days
+                </div>
+
+                {planting.plant.category && (
+                  <div className="flex gap-3 text-xs text-muted-foreground">
+                    <span>Category: <span className="capitalize">{planting.plant.category}</span></span>
+                    <span>Season: {planting.plant.season}</span>
                   </div>
-                </div>
-                <div className="space-y-0.5">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quantity</p>
-                  <span>{selectedEvent.planting.quantity} plant{selectedEvent.planting.quantity !== 1 ? "s" : ""}</span>
-                </div>
+                )}
+
+                {planting.notes && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Notes</p>
+                    <p className="text-sm text-muted-foreground italic border-l-2 border-muted pl-3">{planting.notes}</p>
+                  </div>
+                )}
               </div>
-
-              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded px-3 py-2">
-                <Clock className="h-3.5 w-3.5 shrink-0" />
-                <span>Sprouts in {selectedEvent.planting.plant.daysToSprout} days • Matures in {selectedEvent.planting.plant.daysToMaturity} days</span>
-              </div>
-
-              {selectedEvent.planting.notes && (
-                <p className="text-sm text-muted-foreground italic border-l-2 border-muted pl-3">
-                  {selectedEvent.planting.notes}
-                </p>
-              )}
-
-              <Button
-                className="w-full bg-green-600 hover:bg-green-700"
-                onClick={() => {
-                  setSelectedEvent(null);
-                  navigate("/");
-                }}
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View on Dashboard
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
     </div>
   );
 }
