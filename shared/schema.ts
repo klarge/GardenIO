@@ -35,6 +35,7 @@ export const vendors = pgTable("vendors", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   website: text("website"),
+  address: text("address"),
   category: text("category").notNull(), // seeds, vegetables, herbs, fruits, general
   offersShipping: boolean("offers_shipping").notNull().default(false),
   offersPickup: boolean("offers_pickup").notNull().default(false),

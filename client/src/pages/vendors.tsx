@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Plus, Edit, Trash2, Store, Globe, Truck, ShoppingBag } from "lucide-react";
+import { Plus, Edit, Trash2, Store, Globe, Truck, ShoppingBag, MapPin } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +48,7 @@ function VendorForm({ onSubmit, initialData, isLoading, onCancel }: {
     defaultValues: {
       name: initialData?.name || "",
       website: initialData?.website || "",
+      address: initialData?.address || "",
       category: initialData?.category || "general",
       offersShipping: initialData?.offersShipping ?? false,
       offersPickup: initialData?.offersPickup ?? false,
@@ -104,6 +105,20 @@ function VendorForm({ onSubmit, initialData, isLoading, onCancel }: {
               <FormLabel>Website</FormLabel>
               <FormControl>
                 <Input placeholder="https://example.com" {...field} value={field.value || ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Input placeholder="123 Main St, City, State ZIP" {...field} value={field.value || ""} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -313,6 +328,13 @@ export default function Vendors() {
                     <Globe className="h-3.5 w-3.5 shrink-0" />
                     {vendor.website}
                   </a>
+                )}
+
+                {vendor.address && (
+                  <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
+                    <span>{vendor.address}</span>
+                  </div>
                 )}
 
                 <div className="flex gap-3 text-sm text-muted-foreground">
