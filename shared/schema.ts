@@ -19,6 +19,16 @@ export const plants = pgTable("plants", {
   daysToHarvest: integer("days_to_harvest").notNull(),
   season: text("season").notNull(),
   imageUrl: text("image_url"),
+  // Growing conditions
+  sunRequirement: text("sun_requirement"), // full_sun, full_sun_partial_shade, shade
+  sowInstructions: text("sow_instructions"),
+  daysToEmerge: integer("days_to_emerge"),
+  daysToMaturity: integer("days_to_maturity"),
+  seedDepth: text("seed_depth"),
+  spacing: text("spacing"),
+  supportsNeeded: boolean("supports_needed").default(false),
+  pinching: boolean("pinching").default(false),
+  coldHardiness: text("cold_hardiness"), // cold_sensitive, hardy
 });
 
 export const vendors = pgTable("vendors", {
