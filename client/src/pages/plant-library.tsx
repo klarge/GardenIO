@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Plus, Search, Edit, Trash2, Store } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Store, Sun, Thermometer } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,14 +107,16 @@ export default function PlantLibrary() {
               Add Plant
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>Add New Plant</DialogTitle>
             </DialogHeader>
-            <PlantForm
-              onSubmit={(data, vendorIds) => createPlantMutation.mutate({ data, vendorIds })}
-              isLoading={createPlantMutation.isPending}
-            />
+            <div className="overflow-y-auto flex-1 pr-1">
+              <PlantForm
+                onSubmit={(data, vendorIds) => createPlantMutation.mutate({ data, vendorIds })}
+                isLoading={createPlantMutation.isPending}
+              />
+            </div>
           </DialogContent>
         </Dialog>
       </div>
@@ -198,7 +200,30 @@ export default function PlantLibrary() {
                   </Badge>
                 </div>
                 <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{plant.description}</p>
-                <div className="space-y-2">
+
+                {/* Badges row */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {plant.sunRequirement && (
+                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                      <Sun className="h-3 w-3" />
+                      {plant.sunRequirement === "full_sun" ? "Full Sun" : plant.sunRequirement === "full_sun_partial_shade" ? "Full Sun / Partial Shade" : "Shade"}
+                    </span>
+                  )}
+                  {plant.coldHardiness && (
+                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      <Thermometer className="h-3 w-3" />
+                      {plant.coldHardiness === "hardy" ? "Hardy" : "Cold Sensitive"}
+                    </span>
+                  )}
+                  {plant.supportsNeeded && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">Needs Support</span>
+                  )}
+                  {plant.pinching && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200">Pinching</span>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Days to Sprout:</span>
                     <span className="font-medium">{plant.daysToSprout} days</span>
@@ -207,10 +232,28 @@ export default function PlantLibrary() {
                     <span className="text-muted-foreground">Days to Harvest:</span>
                     <span className="font-medium">{plant.daysToHarvest} days</span>
                   </div>
+                  {plant.daysToMaturity && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Days to Maturity:</span>
+                      <span className="font-medium">{plant.daysToMaturity} days</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Best Season:</span>
                     <span className="font-medium">{plant.season}</span>
                   </div>
+                  {plant.seedDepth && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Seed Depth:</span>
+                      <span className="font-medium">{plant.seedDepth}</span>
+                    </div>
+                  )}
+                  {plant.spacing && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Spacing:</span>
+                      <span className="font-medium">{plant.spacing}</span>
+                    </div>
+                  )}
                 </div>
 
                 {plant.vendors && plant.vendors.length > 0 && (
@@ -272,18 +315,20 @@ export default function PlantLibrary() {
 
       {/* Edit Plant Dialog */}
       <Dialog open={!!editingPlant} onOpenChange={() => setEditingPlant(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Edit Plant</DialogTitle>
           </DialogHeader>
-          {editingPlant && (
-            <PlantForm
-              initialData={editingPlant}
-              initialVendorIds={editingPlant.vendors?.map(v => v.id) || []}
-              onSubmit={(data, vendorIds) => updatePlantMutation.mutate({ id: editingPlant.id, data, vendorIds })}
-              isLoading={updatePlantMutation.isPending}
-            />
-          )}
+          <div className="overflow-y-auto flex-1 pr-1">
+            {editingPlant && (
+              <PlantForm
+                initialData={editingPlant}
+                initialVendorIds={editingPlant.vendors?.map(v => v.id) || []}
+                onSubmit={(data, vendorIds) => updatePlantMutation.mutate({ id: editingPlant.id, data, vendorIds })}
+                isLoading={updatePlantMutation.isPending}
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
