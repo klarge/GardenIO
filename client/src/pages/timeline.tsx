@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Sprout, Clock, TreePine } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sprout, Clock, TreePine, MapPin, CalendarDays, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDate, isToday, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, addDays } from "date-fns";
 import { getRelativeTime } from "@/lib/date-utils";
 import { useGarden } from "@/hooks/use-garden";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import type { PlantingWithPlant } from "@shared/schema";
 
@@ -22,7 +24,9 @@ interface CalendarEvent {
 
 export default function Timeline() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const { currentGarden } = useGarden();
+  const [, navigate] = useLocation();
 
   const { data: plantings = [], isLoading } = useQuery<PlantingWithPlant[]>({
     queryKey: ["/api/plantings", currentGarden?.id],
@@ -59,13 +63,9 @@ export default function Timeline() {
     return events;
   };
 
-  // All events across all plantings
   const allEvents = plantings.flatMap(buildEvents);
-
-  // Events visible in the current month's calendar
   const monthEvents = allEvents.filter(e => e.date >= monthStart && e.date <= monthEnd);
 
-  // Upcoming events (next 30 days)
   const now = new Date();
   const upcoming = allEvents
     .filter(e => e.date > now && e.date <= addMonths(now, 1))
@@ -104,6 +104,8 @@ export default function Timeline() {
 
   const getEventsForDay = (date: Date) =>
     monthEvents.filter(e => format(e.date, "yyyy-MM-dd") === format(date, "yyyy-MM-dd"));
+
+  const openEvent = (event: CalendarEvent) => setSelectedEvent(event);
 
   return (
     <div className="space-y-8">
@@ -152,14 +154,12 @@ export default function Timeline() {
             <div className="animate-pulse h-96 bg-muted rounded" />
           ) : (
             <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
-              {/* Day headers */}
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                 <div key={day} className="bg-muted p-3 text-center text-sm font-medium text-muted-foreground">
                   {day}
                 </div>
               ))}
 
-              {/* Day cells */}
               {calendarDays.map((date) => {
                 const dayEvents = getEventsForDay(date);
                 const isCurrentMonth = isSameMonth(date, currentMonth);
@@ -177,14 +177,15 @@ export default function Timeline() {
                     </div>
                     <div className="space-y-0.5">
                       {dayEvents.map((event, index) => (
-                        <div
+                        <button
                           key={index}
-                          className={`text-xs px-1.5 py-0.5 rounded flex items-center gap-1 ${getEventColor(event.type)}`}
+                          onClick={() => openEvent(event)}
+                          className={`w-full text-left text-xs px-1.5 py-0.5 rounded flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity ${getEventColor(event.type)}`}
                           title={event.title}
                         >
                           {getEventIcon(event.type)}
                           <span className="truncate">{event.planting.plant.name}</span>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -206,7 +207,11 @@ export default function Timeline() {
           ) : (
             <div className="space-y-3">
               {upcoming.map((event, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-muted rounded-lg gap-4">
+                <button
+                  key={index}
+                  onClick={() => openEvent(event)}
+                  className="w-full text-left flex items-center justify-between p-4 bg-muted rounded-lg gap-4 hover:bg-muted/70 transition-colors cursor-pointer"
+                >
                   <div className="flex items-center gap-4 min-w-0">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${getEventColor(event.type)}`}>
                       {getEventIcon(event.type)}
@@ -219,12 +224,85 @@ export default function Timeline() {
                   <Badge className={`${getEventColor(event.type)} shrink-0`}>
                     {getEventLabel(event.type)}
                   </Badge>
-                </div>
+                </button>
               ))}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Event Detail Dialog */}
+      {selectedEvent && (
+        <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${getEventColor(selectedEvent.type)}`}>
+                  {getEventIcon(selectedEvent.type)}
+                  {getEventLabel(selectedEvent.type)}
+                </span>
+                <span className="truncate">{selectedEvent.planting.plant.name}</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              {selectedEvent.planting.plant.cultivar && (
+                <p className="text-sm text-muted-foreground -mt-2">{selectedEvent.planting.plant.cultivar}</p>
+              )}
+
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="space-y-0.5">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Event Date</p>
+                  <div className="flex items-center gap-1.5">
+                    <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span>{format(selectedEvent.date, "MMM d, yyyy")}</span>
+                  </div>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Planted</p>
+                  <div className="flex items-center gap-1.5">
+                    <Sprout className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span>{format(new Date(selectedEvent.planting.plantedDate), "MMM d, yyyy")}</span>
+                  </div>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Location</p>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span>{selectedEvent.planting.location}</span>
+                  </div>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quantity</p>
+                  <span>{selectedEvent.planting.quantity} plant{selectedEvent.planting.quantity !== 1 ? "s" : ""}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded px-3 py-2">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                <span>Sprouts in {selectedEvent.planting.plant.daysToSprout} days • Matures in {selectedEvent.planting.plant.daysToMaturity} days</span>
+              </div>
+
+              {selectedEvent.planting.notes && (
+                <p className="text-sm text-muted-foreground italic border-l-2 border-muted pl-3">
+                  {selectedEvent.planting.notes}
+                </p>
+              )}
+
+              <Button
+                className="w-full bg-green-600 hover:bg-green-700"
+                onClick={() => {
+                  setSelectedEvent(null);
+                  navigate("/");
+                }}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View on Dashboard
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
