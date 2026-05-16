@@ -1,98 +1,129 @@
-<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+<svg width="800" height="580" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
-  <rect width="800" height="600" fill="#f8fafc"/>
-  
-  <!-- Header -->
-  <rect x="0" y="0" width="800" height="60" fill="#1f2937"/>
-  <text x="20" y="35" font-family="Arial, sans-serif" font-size="18" fill="white" font-weight="bold">Plant Library</text>
-  <rect x="650" y="15" width="130" height="30" fill="#3b82f6" rx="4"/>
-  <text x="715" y="33" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">+ Add Plant</text>
-  
-  <!-- Search Bar -->
-  <rect x="20" y="80" width="300" height="40" fill="white" stroke="#e5e7eb" rx="8"/>
-  <text x="30" y="103" font-family="Arial, sans-serif" font-size="14" fill="#9ca3af">Search plants...</text>
-  
-  <!-- Category Filter -->
-  <rect x="340" y="80" width="150" height="40" fill="white" stroke="#e5e7eb" rx="8"/>
-  <text x="350" y="103" font-family="Arial, sans-serif" font-size="14" fill="#374151">All Categories</text>
-  
-  <!-- Plant Cards Grid -->
-  <!-- Plant Card 1 - Tomato -->
-  <rect x="20" y="140" width="180" height="200" fill="white" stroke="#e5e7eb" rx="8"/>
-  <rect x="30" y="150" width="160" height="80" fill="#fef3c7" rx="4"/>
-  <text x="110" y="195" font-family="Arial, sans-serif" font-size="12" fill="#d97706" text-anchor="middle">🍅 Tomato Image</text>
-  <text x="30" y="250" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Tomato - Cherry</text>
-  <text x="30" y="265" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Vegetable</text>
-  <text x="30" y="280" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to sprout: 7-14</text>
-  <text x="30" y="295" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to harvest: 60-80</text>
-  <rect x="30" y="305" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="50" y="317" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Spring</text>
-  <rect x="75" y="305" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="95" y="317" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Summer</text>
-  
-  <!-- Plant Card 2 - Basil -->
-  <rect x="220" y="140" width="180" height="200" fill="white" stroke="#e5e7eb" rx="8"/>
-  <rect x="230" y="150" width="160" height="80" fill="#dcfce7" rx="4"/>
-  <text x="310" y="195" font-family="Arial, sans-serif" font-size="12" fill="#16a34a" text-anchor="middle">🌿 Basil Image</text>
-  <text x="230" y="250" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Basil - Sweet</text>
-  <text x="230" y="265" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Herb</text>
-  <text x="230" y="280" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to sprout: 5-10</text>
-  <text x="230" y="295" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to harvest: 30-45</text>
-  <rect x="230" y="305" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="250" y="317" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Spring</text>
-  <rect x="275" y="305" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="295" y="317" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Summer</text>
-  
-  <!-- Plant Card 3 - Lettuce -->
-  <rect x="420" y="140" width="180" height="200" fill="white" stroke="#e5e7eb" rx="8"/>
-  <rect x="430" y="150" width="160" height="80" fill="#f0fdf4" rx="4"/>
-  <text x="510" y="195" font-family="Arial, sans-serif" font-size="12" fill="#22c55e" text-anchor="middle">🥬 Lettuce Image</text>
-  <text x="430" y="250" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Lettuce - Romaine</text>
-  <text x="430" y="265" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Vegetable</text>
-  <text x="430" y="280" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to sprout: 7-14</text>
-  <text x="430" y="295" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to harvest: 45-55</text>
-  <rect x="430" y="305" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="450" y="317" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Spring</text>
-  <rect x="475" y="305" width="30" height="20" fill="#10b981" rx="4"/>
-  <text x="490" y="317" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Fall</text>
-  
-  <!-- Plant Card 4 - Peppers -->
-  <rect x="620" y="140" width="160" height="200" fill="white" stroke="#e5e7eb" rx="8"/>
-  <rect x="630" y="150" width="140" height="80" fill="#fef2f2" rx="4"/>
-  <text x="700" y="195" font-family="Arial, sans-serif" font-size="12" fill="#dc2626" text-anchor="middle">🌶️ Pepper Image</text>
-  <text x="630" y="250" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Pepper - Bell</text>
-  <text x="630" y="265" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Vegetable</text>
-  <text x="630" y="280" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to sprout: 7-14</text>
-  <text x="630" y="295" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to harvest: 60-90</text>
-  <rect x="630" y="305" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="650" y="317" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Spring</text>
-  <rect x="675" y="305" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="695" y="317" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Summer</text>
-  
-  <!-- Second Row -->
-  <!-- Plant Card 5 - Carrots -->
-  <rect x="20" y="360" width="180" height="200" fill="white" stroke="#e5e7eb" rx="8"/>
-  <rect x="30" y="370" width="160" height="80" fill="#fff7ed" rx="4"/>
-  <text x="110" y="415" font-family="Arial, sans-serif" font-size="12" fill="#ea580c" text-anchor="middle">🥕 Carrot Image</text>
-  <text x="30" y="470" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Carrot - Nantes</text>
-  <text x="30" y="485" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Root Vegetable</text>
-  <text x="30" y="500" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to sprout: 14-21</text>
-  <text x="30" y="515" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to harvest: 70-80</text>
-  <rect x="30" y="525" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="50" y="537" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Spring</text>
-  <rect x="75" y="525" width="30" height="20" fill="#10b981" rx="4"/>
-  <text x="90" y="537" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Fall</text>
-  
-  <!-- Plant Card 6 - Cucumber -->
-  <rect x="220" y="360" width="180" height="200" fill="white" stroke="#e5e7eb" rx="8"/>
-  <rect x="230" y="370" width="160" height="80" fill="#f0fdf4" rx="4"/>
-  <text x="310" y="415" font-family="Arial, sans-serif" font-size="12" fill="#15803d" text-anchor="middle">🥒 Cucumber Image</text>
-  <text x="230" y="470" font-family="Arial, sans-serif" font-size="14" fill="#1f2937" font-weight="bold">Cucumber - Slicing</text>
-  <text x="230" y="485" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Vegetable</text>
-  <text x="230" y="500" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to sprout: 7-14</text>
-  <text x="230" y="515" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Days to harvest: 50-70</text>
-  <rect x="230" y="525" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="250" y="537" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Spring</text>
-  <rect x="275" y="525" width="40" height="20" fill="#10b981" rx="4"/>
-  <text x="295" y="537" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Summer</text>
+  <rect width="800" height="580" fill="#f8fafc"/>
+
+  <!-- Nav bar -->
+  <rect x="0" y="0" width="800" height="52" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+  <circle cx="28" cy="26" r="10" fill="#16a34a"/>
+  <text x="44" y="31" font-family="Arial, sans-serif" font-size="15" fill="#1f2937" font-weight="bold">GardenIO</text>
+  <text x="150" y="31" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Dashboard</text>
+  <text x="240" y="31" font-family="Arial, sans-serif" font-size="13" fill="#16a34a" font-weight="bold">Plant Library</text>
+  <text x="360" y="31" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Vendors</text>
+  <text x="440" y="31" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Locations</text>
+  <text x="530" y="31" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Calendar</text>
+
+  <!-- Page title + Add button -->
+  <text x="24" y="86" font-family="Arial, sans-serif" font-size="20" fill="#111827" font-weight="bold">Plant Library</text>
+  <text x="24" y="104" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Browse and manage your plant varieties</text>
+  <rect x="662" y="70" width="114" height="34" fill="#16a34a" rx="7"/>
+  <text x="719" y="92" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">+ Add Plant</text>
+
+  <!-- Search + filter bar -->
+  <rect x="24" y="116" width="280" height="34" fill="white" stroke="#e5e7eb" rx="7"/>
+  <text x="38" y="136" font-family="Arial, sans-serif" font-size="12" fill="#9ca3af">Search plants...</text>
+  <rect x="316" y="116" width="130" height="34" fill="white" stroke="#e5e7eb" rx="7"/>
+  <text x="381" y="136" font-family="Arial, sans-serif" font-size="12" fill="#374151" text-anchor="middle">All Categories ▾</text>
+
+  <!-- Card 1 – Tomato (Vegetable, Heirloom) -->
+  <rect x="24" y="164" width="176" height="196" fill="white" stroke="#e5e7eb" rx="9"/>
+  <rect x="24" y="164" width="176" height="72" fill="#fef9c3" rx="9"/>
+  <text x="112" y="206" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">🍅</text>
+  <text x="36" y="252" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Tomato - Cherry</text>
+  <text x="36" y="267" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sungold</text>
+  <rect x="36" y="275" width="60" height="16" fill="#dcfce7" rx="4"/>
+  <text x="66" y="286" font-family="Arial, sans-serif" font-size="9" fill="#15803d" text-anchor="middle">Vegetable</text>
+  <rect x="102" y="275" width="52" height="16" fill="#dbeafe" rx="4"/>
+  <text x="128" y="286" font-family="Arial, sans-serif" font-size="9" fill="#1d4ed8" text-anchor="middle">Heirloom</text>
+  <text x="36" y="306" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sprout: 7d · Maturity: 75d</text>
+  <text x="36" y="320" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Season: Summer</text>
+  <text x="36" y="334" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">☀ Full Sun · Direct sow</text>
+  <text x="36" y="348" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Baker Creek Seeds</text>
+
+  <!-- Card 2 – Basil (Herb) -->
+  <rect x="212" y="164" width="176" height="196" fill="white" stroke="#e5e7eb" rx="9"/>
+  <rect x="212" y="164" width="176" height="72" fill="#dcfce7" rx="9"/>
+  <text x="300" y="206" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">🌿</text>
+  <text x="224" y="252" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Basil - Sweet</text>
+  <text x="224" y="267" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Genovese</text>
+  <rect x="224" y="275" width="40" height="16" fill="#f3e8ff" rx="4"/>
+  <text x="244" y="286" font-family="Arial, sans-serif" font-size="9" fill="#6d28d9" text-anchor="middle">Herb</text>
+  <text x="224" y="306" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sprout: 5d · Maturity: 40d</text>
+  <text x="224" y="320" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Season: Summer</text>
+  <text x="224" y="334" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">☀ Full Sun · Start inside</text>
+  <text x="224" y="348" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Local Greenhouse Co.</text>
+
+  <!-- Card 3 – Lavender (Flower, Perennial) -->
+  <rect x="400" y="164" width="176" height="196" fill="white" stroke="#e5e7eb" rx="9"/>
+  <rect x="400" y="164" width="176" height="72" fill="#fce7f3" rx="9"/>
+  <text x="488" y="206" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">💜</text>
+  <text x="412" y="252" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Lavender</text>
+  <text x="412" y="267" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Hidcote</text>
+  <rect x="412" y="275" width="46" height="16" fill="#fce7f3" rx="4"/>
+  <text x="435" y="286" font-family="Arial, sans-serif" font-size="9" fill="#9d174d" text-anchor="middle">Flower</text>
+  <rect x="464" y="275" width="56" height="16" fill="#f3e8ff" rx="4"/>
+  <text x="492" y="286" font-family="Arial, sans-serif" font-size="9" fill="#6d28d9" text-anchor="middle">Perennial</text>
+  <text x="412" y="306" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sprout: 14d · Maturity: 90d</text>
+  <text x="412" y="320" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Season: Spring</text>
+  <text x="412" y="334" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">☀ Full Sun · Direct sow</text>
+
+  <!-- Card 4 – Apple (Tree, Perennial) -->
+  <rect x="588" y="164" width="188" height="196" fill="white" stroke="#e5e7eb" rx="9"/>
+  <rect x="588" y="164" width="188" height="72" fill="#ccfbf1" rx="9"/>
+  <text x="682" y="206" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">🌳</text>
+  <text x="600" y="252" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Apple - Fuji</text>
+  <text x="600" y="267" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Malus domestica</text>
+  <rect x="600" y="275" width="36" height="16" fill="#ccfbf1" rx="4"/>
+  <text x="618" y="286" font-family="Arial, sans-serif" font-size="9" fill="#0f766e" text-anchor="middle">Tree</text>
+  <rect x="642" y="275" width="56" height="16" fill="#f3e8ff" rx="4"/>
+  <text x="670" y="286" font-family="Arial, sans-serif" font-size="9" fill="#6d28d9" text-anchor="middle">Perennial</text>
+  <text x="600" y="306" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sprout: 21d · Maturity: 365d</text>
+  <text x="600" y="320" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Season: Spring</text>
+  <text x="600" y="334" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">☀ Full Sun · Hardy</text>
+
+  <!-- Row 2 -->
+  <!-- Card 5 – Sunflower (Flower) -->
+  <rect x="24" y="374" width="176" height="180" fill="white" stroke="#e5e7eb" rx="9"/>
+  <rect x="24" y="374" width="176" height="72" fill="#fef9c3" rx="9"/>
+  <text x="112" y="416" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">🌻</text>
+  <text x="36" y="462" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Sunflower</text>
+  <text x="36" y="477" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Mammoth Russian</text>
+  <rect x="36" y="485" width="46" height="16" fill="#fce7f3" rx="4"/>
+  <text x="59" y="496" font-family="Arial, sans-serif" font-size="9" fill="#9d174d" text-anchor="middle">Flower</text>
+  <text x="36" y="514" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sprout: 7d · Maturity: 80d</text>
+  <text x="36" y="528" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Season: Summer</text>
+
+  <!-- Card 6 – Lettuce (Vegetable) -->
+  <rect x="212" y="374" width="176" height="180" fill="white" stroke="#e5e7eb" rx="9"/>
+  <rect x="212" y="374" width="176" height="72" fill="#f0fdf4" rx="9"/>
+  <text x="300" y="416" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">🥬</text>
+  <text x="224" y="462" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Lettuce - Romaine</text>
+  <text x="224" y="477" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Little Gem</text>
+  <rect x="224" y="485" width="60" height="16" fill="#dcfce7" rx="4"/>
+  <text x="254" y="496" font-family="Arial, sans-serif" font-size="9" fill="#15803d" text-anchor="middle">Vegetable</text>
+  <text x="224" y="514" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sprout: 5d · Maturity: 50d</text>
+  <text x="224" y="528" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Season: Spring / Fall</text>
+
+  <!-- Card 7 – Pepper (Vegetable, Heirloom) -->
+  <rect x="400" y="374" width="176" height="180" fill="white" stroke="#e5e7eb" rx="9"/>
+  <rect x="400" y="374" width="176" height="72" fill="#fef2f2" rx="9"/>
+  <text x="488" y="416" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">🌶️</text>
+  <text x="412" y="462" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Pepper - Bell</text>
+  <text x="412" y="477" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">California Wonder</text>
+  <rect x="412" y="485" width="60" height="16" fill="#dcfce7" rx="4"/>
+  <text x="442" y="496" font-family="Arial, sans-serif" font-size="9" fill="#15803d" text-anchor="middle">Vegetable</text>
+  <rect x="478" y="485" width="52" height="16" fill="#dbeafe" rx="4"/>
+  <text x="504" y="496" font-family="Arial, sans-serif" font-size="9" fill="#1d4ed8" text-anchor="middle">Heirloom</text>
+  <text x="412" y="514" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sprout: 10d · Maturity: 80d</text>
+  <text x="412" y="528" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Season: Summer</text>
+
+  <!-- Card 8 – Carrot (Vegetable) -->
+  <rect x="588" y="374" width="188" height="180" fill="white" stroke="#e5e7eb" rx="9"/>
+  <rect x="588" y="374" width="188" height="72" fill="#fff7ed" rx="9"/>
+  <text x="682" y="416" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">🥕</text>
+  <text x="600" y="462" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Carrot - Nantes</text>
+  <text x="600" y="477" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Scarlet Nantes</text>
+  <rect x="600" y="485" width="60" height="16" fill="#dcfce7" rx="4"/>
+  <text x="630" y="496" font-family="Arial, sans-serif" font-size="9" fill="#15803d" text-anchor="middle">Vegetable</text>
+  <text x="600" y="514" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sprout: 14d · Maturity: 75d</text>
+  <text x="600" y="528" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Season: Spring / Fall</text>
 </svg>

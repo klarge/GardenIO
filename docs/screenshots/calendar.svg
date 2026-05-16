@@ -1,0 +1,144 @@
+<svg width="800" height="580" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="580" fill="#f8fafc"/>
+
+  <!-- Nav bar -->
+  <rect x="0" y="0" width="800" height="52" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+  <circle cx="28" cy="26" r="10" fill="#16a34a"/>
+  <text x="44" y="31" font-family="Arial, sans-serif" font-size="15" fill="#1f2937" font-weight="bold">GardenIO</text>
+  <text x="150" y="31" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Dashboard</text>
+  <text x="240" y="31" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Plant Library</text>
+  <text x="354" y="31" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Vendors</text>
+  <text x="434" y="31" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Locations</text>
+  <text x="524" y="31" font-family="Arial, sans-serif" font-size="13" fill="#16a34a" font-weight="bold">Calendar</text>
+
+  <!-- Page title -->
+  <text x="24" y="86" font-family="Arial, sans-serif" font-size="20" fill="#111827" font-weight="bold">Garden Calendar</text>
+  <text x="24" y="104" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Track planting milestones and upcoming garden activities</text>
+
+  <!-- Legend -->
+  <rect x="24" y="116" width="68" height="20" fill="#15803d" rx="10"/>
+  <text x="58" y="129" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">🌱 Planted</text>
+  <rect x="100" y="116" width="78" height="20" fill="#ca8a04" rx="10"/>
+  <text x="139" y="129" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">⏱ Sprouting</text>
+  <rect x="186" y="116" width="76" height="20" fill="#dc2626" rx="10"/>
+  <text x="224" y="129" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">🌳 Maturity</text>
+
+  <!-- Month nav -->
+  <rect x="24" y="144" width="752" height="42" fill="white" stroke="#e5e7eb" rx="8"/>
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="14" fill="#374151" text-anchor="middle">◀</text>
+  <text x="400" y="170" font-family="Arial, sans-serif" font-size="15" fill="#111827" font-weight="bold" text-anchor="middle">May 2026</text>
+  <text x="700" y="170" font-family="Arial, sans-serif" font-size="14" fill="#374151" text-anchor="middle">▶</text>
+  <rect x="716" y="155" width="50" height="22" fill="#f3f4f6" rx="5" stroke="#e5e7eb"/>
+  <text x="741" y="169" font-family="Arial, sans-serif" font-size="10" fill="#374151" text-anchor="middle">Today</text>
+
+  <!-- Calendar grid -->
+  <rect x="24" y="194" width="752" height="228" fill="white" stroke="#e5e7eb" rx="8"/>
+
+  <!-- Day headers -->
+  <rect x="24" y="194" width="752" height="26" fill="#f9fafb" rx="8"/>
+  <line x1="24" y1="220" x2="776" y2="220" stroke="#e5e7eb"/>
+  <text x="80" y="211" font-family="Arial, sans-serif" font-size="10" fill="#6b7280" text-anchor="middle">Sun</text>
+  <text x="188" y="211" font-family="Arial, sans-serif" font-size="10" fill="#6b7280" text-anchor="middle">Mon</text>
+  <text x="296" y="211" font-family="Arial, sans-serif" font-size="10" fill="#6b7280" text-anchor="middle">Tue</text>
+  <text x="404" y="211" font-family="Arial, sans-serif" font-size="10" fill="#6b7280" text-anchor="middle">Wed</text>
+  <text x="512" y="211" font-family="Arial, sans-serif" font-size="10" fill="#6b7280" text-anchor="middle">Thu</text>
+  <text x="620" y="211" font-family="Arial, sans-serif" font-size="10" fill="#6b7280" text-anchor="middle">Fri</text>
+  <text x="728" y="211" font-family="Arial, sans-serif" font-size="10" fill="#6b7280" text-anchor="middle">Sat</text>
+
+  <!-- Column dividers -->
+  <line x1="131" y1="194" x2="131" y2="422" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="239" y1="194" x2="239" y2="422" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="347" y1="194" x2="347" y2="422" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="455" y1="194" x2="455" y2="422" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="563" y1="194" x2="563" y2="422" stroke="#e5e7eb" stroke-width="0.5"/>
+  <line x1="671" y1="194" x2="671" y2="422" stroke="#e5e7eb" stroke-width="0.5"/>
+
+  <!-- Row divider -->
+  <line x1="24" y1="316" x2="776" y2="316" stroke="#e5e7eb" stroke-width="0.5"/>
+
+  <!-- Week 1 dates (Apr 26 – May 2) -->
+  <text x="38" y="235" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af">26</text>
+  <text x="146" y="235" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af">27</text>
+  <text x="254" y="235" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af">28</text>
+  <text x="362" y="235" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af">29</text>
+  <text x="470" y="235" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af">30</text>
+  <text x="578" y="235" font-family="Arial, sans-serif" font-size="10" fill="#111827">1</text>
+  <text x="686" y="235" font-family="Arial, sans-serif" font-size="10" fill="#111827">2</text>
+
+  <!-- Events week 1 -->
+  <rect x="578" y="240" width="83" height="15" fill="#15803d" rx="3"/>
+  <text x="619" y="250" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">🌱 Basil</text>
+  <rect x="686" y="240" width="83" height="15" fill="#15803d" rx="3"/>
+  <text x="728" y="250" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">🌱 Sunflower</text>
+  <rect x="686" y="258" width="83" height="15" fill="#ca8a04" rx="3"/>
+  <text x="728" y="268" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">⏱ Tomato</text>
+
+  <!-- Week 2 dates (May 3 – May 9) -->
+  <text x="38" y="331" font-family="Arial, sans-serif" font-size="10" fill="#111827">3</text>
+  <text x="146" y="331" font-family="Arial, sans-serif" font-size="10" fill="#111827">4</text>
+  <text x="254" y="331" font-family="Arial, sans-serif" font-size="10" fill="#111827">5</text>
+  <text x="362" y="331" font-family="Arial, sans-serif" font-size="10" fill="#111827">6</text>
+  <text x="470" y="331" font-family="Arial, sans-serif" font-size="10" fill="#111827">7</text>
+  <!-- Today highlight -->
+  <circle cx="582" cy="329" r="8" fill="#16a34a"/>
+  <text x="582" y="333" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">8</text>
+  <text x="690" y="331" font-family="Arial, sans-serif" font-size="10" fill="#111827">9</text>
+
+  <!-- Events week 2 -->
+  <rect x="254" y="336" width="83" height="15" fill="#ca8a04" rx="3"/>
+  <text x="295" y="346" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">⏱ Lettuce</text>
+  <rect x="254" y="354" width="83" height="15" fill="#dc2626" rx="3"/>
+  <text x="295" y="364" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">🌳 Basil</text>
+  <rect x="578" y="336" width="83" height="15" fill="#15803d" rx="3"/>
+  <text x="619" y="346" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">🌱 Carrot</text>
+  <rect x="686" y="336" width="83" height="15" fill="#dc2626" rx="3"/>
+  <text x="728" y="346" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">🌳 Tomato</text>
+
+  <!-- Planting detail popup (shown when event is clicked) -->
+  <rect x="430" y="198" width="220" height="220" fill="white" stroke="#d1d5db" rx="10" filter="url(#shadow)"/>
+  <defs>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#00000022"/>
+    </filter>
+  </defs>
+  <!-- Popup header -->
+  <rect x="430" y="198" width="220" height="4" fill="#dc2626" rx="10"/>
+  <rect x="440" y="210" width="60" height="18" fill="#fecaca" rx="6"/>
+  <text x="470" y="222" font-family="Arial, sans-serif" font-size="9" fill="#b91c1c" text-anchor="middle">🌳 Maturity</text>
+  <text x="440" y="244" font-family="Arial, sans-serif" font-size="13" fill="#111827" font-weight="bold">Tomato - Cherry</text>
+  <text x="440" y="258" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Sungold</text>
+  <rect x="596" y="208" width="44" height="18" fill="#dcfce7" rx="5"/>
+  <text x="618" y="220" font-family="Arial, sans-serif" font-size="9" fill="#15803d" text-anchor="middle">Ready</text>
+  <!-- popup body -->
+  <text x="440" y="278" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">📅 Event:  May 9, 2026</text>
+  <text x="440" y="294" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">🌱 Planted:  Mar 25, 2026</text>
+  <text x="440" y="310" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">📍 Location:  Greenhouse</text>
+  <text x="440" y="326" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">🔢 Quantity:  6 plants</text>
+  <rect x="440" y="336" width="200" height="22" fill="#f3f4f6" rx="5"/>
+  <text x="540" y="350" font-family="Arial, sans-serif" font-size="9" fill="#6b7280" text-anchor="middle">⏱ Sprouts in 7d  ·  Matures in 75d</text>
+  <!-- close X -->
+  <text x="636" y="212" font-family="Arial, sans-serif" font-size="13" fill="#9ca3af">×</text>
+  <!-- click hint -->
+  <text x="540" y="398" font-family="Arial, sans-serif" font-size="9" fill="#9ca3af" text-anchor="middle">Click any event chip to see planting details</text>
+
+  <!-- Upcoming Events section -->
+  <text x="24" y="444" font-family="Arial, sans-serif" font-size="14" fill="#111827" font-weight="bold">Upcoming Events (Next 30 Days)</text>
+
+  <!-- Event rows -->
+  <rect x="24" y="452" width="752" height="40" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="36" y="462" width="22" height="22" fill="#ca8a04" rx="11"/>
+  <text x="47" y="476" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">⏱</text>
+  <text x="70" y="470" font-family="Arial, sans-serif" font-size="12" fill="#111827" font-weight="bold">Lettuce - Romaine sprouting</text>
+  <text x="70" y="483" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Raised Bed 1  ·  Expected: May 13, 2026 (in 5 days)</text>
+  <rect x="700" y="460" width="62" height="18" fill="#ca8a04" rx="5"/>
+  <text x="731" y="472" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Sprouting</text>
+
+  <rect x="24" y="498" width="752" height="40" fill="white" stroke="#e5e7eb" rx="8"/>
+  <rect x="36" y="508" width="22" height="22" fill="#dc2626" rx="11"/>
+  <text x="47" y="522" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">🌳</text>
+  <text x="70" y="516" font-family="Arial, sans-serif" font-size="12" fill="#111827" font-weight="bold">Basil - Sweet reaching maturity</text>
+  <text x="70" y="529" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">Herb Garden  ·  Expected: May 18, 2026 (in 10 days)</text>
+  <rect x="700" y="506" width="62" height="18" fill="#dc2626" rx="5"/>
+  <text x="731" y="518" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Maturity</text>
+</svg>
