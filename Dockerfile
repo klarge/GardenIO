@@ -41,6 +41,9 @@ COPY --from=build /app/dist ./dist
 COPY shared ./shared
 COPY drizzle.config.ts ./
 
+# Install bash (not included in Alpine by default)
+RUN apk add --no-cache bash
+
 # Copy startup script
 COPY docker-start.sh ./
 RUN chmod +x docker-start.sh
