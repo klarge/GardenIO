@@ -51,10 +51,6 @@ RUN chmod +x docker-start.sh
 # Create uploads directory
 RUN mkdir -p uploads
 
-# Install wait-for-it script for database readiness
-ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /usr/local/bin/wait-for-it
-RUN chmod +x /usr/local/bin/wait-for-it
-
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S gardenio -u 1001
