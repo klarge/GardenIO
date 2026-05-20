@@ -12,6 +12,8 @@ export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
 
+  if (!user) return null;
+
   const navItems = [
     { href: "/", label: "Dashboard" },
     { href: "/library", label: "Plant Library" },
