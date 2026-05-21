@@ -35,7 +35,14 @@ export function GardenProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  // Set the first garden as current if none is selected
+  // Clear current garden when the user logs out (gardens becomes empty)
+  useEffect(() => {
+    if (gardens.length === 0 && currentGarden !== null) {
+      setCurrentGarden(null);
+    }
+  }, [gardens]);
+
+  // Set the last-used garden (or first garden) when gardens load
   useEffect(() => {
     if (gardens.length > 0 && !currentGarden) {
       const savedGardenId = localStorage.getItem("currentGardenId");
